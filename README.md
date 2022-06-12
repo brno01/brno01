@@ -1,8 +1,11 @@
-## Oi! Eu sou o <a href="https://www.linkedin.com/in/bruno-santos-de-oliveira-3191a020b"><i>Bruno Santos</i></a>, estudando programação e tecnologia!
+<div>
+  <h1 align="center">Oi! Eu sou o <a href="https://www.linkedin.com/in/bruno-santos-de-oliveira-3191a020b"><i>Bruno Santos</i></a>, estou estudando programação e iniciando como Desenvolvedor!</a> 😃️</h1>
+    <p align="center"> É um prazer te receber por aqui! :heart: </div>
+<p>
 <div align="center">
   <a href="https://github.com/brno01">
     <img height="150em" src="https://github-readme-stats.vercel.app/api?username=brno01&count_private=true&include_all_commits=true&show_icons=true&theme=dracula&hide_border=false&show_owner=true"/>
-    <img height="150em" src="https://github-readme-stats.vercel.app/api/top-langs/?username=brno01&theme=dracula&hide_border=false&&layout=compact"/><p>
+    <img height="150em" src="https://github-readme-stats.vercel.app/api/top-langs/?username=brno01&theme=dracula&hide_border=false&&layout=compact"/>
   </a>
 </div>
 <p>
