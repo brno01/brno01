@@ -1,8 +1,9 @@
 ## Oi! Eu sou o <a href="https://www.linkedin.com/in/bruno-santos-de-oliveira-3191a020b"><i>Bruno Santos</i></a>, estudando programação e tecnologia!
-<div align="left">
+<div align="center">
   <a href="https://github.com/brno01">
-  <img height="180em" src="https://github-readme-stats.vercel.app/api?username=brno01&show_icons=true&theme=dark&include_all_commits=true&count_private=true"/>
-  <img height="180em" src="https://github-readme-stats.vercel.app/api/top-langs/?username=brno01&layout=compact&langs_count=7&theme=dark"/>
+    <img height="150em" src="https://github-readme-stats.vercel.app/api?username=brno01&count_private=true&include_all_commits=true&show_icons=true&theme=dracula&hide_border=false&show_owner=true"/>
+    <img height="150em" src="https://github-readme-stats.vercel.app/api/top-langs/?username=brno01&theme=dracula&hide_border=false&&layout=compact"/>
+  </a>
 </div>
 
 ##
@@ -34,4 +35,13 @@
  
   ![Snake animation](https://github.com/brno01/brno01/blob/output/github-contribution-grid-snake.svg)
  
+</div>
+
+ ##
+
+<div align="center">
+  <p>Feito com :heart:!
+  <p>Obrigado pela Visita!
+  <p>Créditos: <a href="https://github.com/rafaballerini">Rafaella Ballerini</a> e <a href="https://github.com/duribeiro/duribeiro">Eduardo Ribeiro</a><p>
+  
 </div>
