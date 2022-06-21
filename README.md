@@ -4,8 +4,8 @@
 <p>
 <div align="center">
   <a href="https://github.com/brno01">
-    <img height="150em" src="https://github-readme-stats.vercel.app/api?username=brno01&count_private=true&include_all_commits=true&show_icons=true&theme=dracula&hide_border=false&show_owner=true&&layout=default&&include_all_commits"/>
-    <img height="150em" src="https://github-readme-stats.vercel.app/api/top-langs/?username=brno01&theme=dracula&hide_border=false&&layout=default&&include_all_commits"/>
+    <img height="150em" src="https://github-readme-stats.vercel.app/api?username=brno01&count_private=true&include_all_commits=true&show_icons=true&theme=monokai&hide_border=false&show_owner=true&&layout=default&&include_all_commits"/>
+    <img height="150em" src="https://github-readme-stats.vercel.app/api/top-langs/?username=brno01&theme=monokai&hide_border=false&&layout=default&&include_all_commits"/>
   </a>
 </div>
 <p>
@@ -22,7 +22,7 @@
 
 <b>Utilizando:<b>
 <div style="display: inline_block"><br>
-  <img align="" alt="VSCODE" height="50" width="60" src="https://raw.githubusercontent.com/devicons/devicon/master/icons/vscode/vscode-original.svg">
+  <img align="" alt="VSCode" height="50" width="60" src="https://raw.githubusercontent.com/devicons/devicon/master/icons/vscode/vscode-original.svg">
 
 </div>
 
