@@ -1,5 +1,5 @@
 <div>
-  <h1 align="center">Oi! Eu sou o <a href="https://www.linkedin.com/in/bruno-santos-de-oliveira-3191a020b"><i>Bruno Santos</i></a>, estou estudando programação e iniciando como Desenvolvedor!</a> 😃️</h1>
+  <h1 align="center">Oi! Eu sou o <a href="https://www.linkedin.com/in/bruno-santos-de-oliveira-3191a020b"><i>Bruno</i></a>, estou estudando programação e iniciando como Desenvolvedor!</a> 😃️</h1>
     <p align="center"> É um prazer te receber por aqui! :heart: </div>
 <p>
 <div align="center">
