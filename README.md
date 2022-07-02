@@ -22,7 +22,7 @@
 
 ##
 
-<b>Utilizando:<b>
+<b>Utilizo:<b>
 <div style="display: inline_block"><br>
   <img align="" alt="VSCode" height="50" width="60" src="https://raw.githubusercontent.com/devicons/devicon/master/icons/vscode/vscode-original.svg">
 
