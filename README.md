@@ -22,10 +22,12 @@
 
 ##
 
-<b>Utilizo:<b>
+<b>Uso:<b>
 <div style="display: inline_block"><br>
+  <img align="" alt="WebStorm" height="50" width="60" src="https://raw.githubusercontent.com/brno01/devicon/master/icons/webstorm/webstorm-original.svg">
   <img align="" alt="VSCode" height="50" width="60" src="https://raw.githubusercontent.com/devicons/devicon/master/icons/vscode/vscode-original.svg">
-  <img align="" alt="VSCode" height="50" width="60" src="https://raw.githubusercontent.com/brno01/devicon/master/icons/windows8/windows8-original.svg">
+  <img align="" alt="PhpStorm" height="50" width="60" src="https://raw.githubusercontent.com/brno01/devicon/master/icons/phpstorm/phpstorm-original.svg">
+  <img align="" alt="Win11" height="50" width="60" src="https://raw.githubusercontent.com/brno01/devicon/master/icons/windows8/windows8-original.svg">
 </div>
 
  ##
