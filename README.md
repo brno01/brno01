@@ -10,24 +10,15 @@
 </div>
 <p>
 
-<b>Estou estudando:<b>
+<b>Estou estudando sobre:<b>
 <div style="display: inline_block"><br>
   <img align="center" alt="Bruno-NestJS" height="50" width"60" src="https://raw.githubusercontent.com/brno01/devicon/master/icons/nestjs/nestjs-plain.svg">
-  <img align="center" alt="TypeORM" height="50" width"60" src="https://raw.githubusercontent.com/typeorm/typeorm/master/resources/logo_big.png">
   <img align="center" alt="Bruno-TS" height="50" width"60" src="https://raw.githubusercontent.com/brno01/devicon/master/icons/typescript/typescript-original.svg">
   <img align="center" alt="Bruno-JS" height="50" width="60" src="https://raw.githubusercontent.com/devicons/devicon/master/icons/javascript/javascript-plain.svg">
+  <img align="center" alt="Bruno-Python" height="50" width"60" src="https://raw.githubusercontent.com/brno01/devicon/master/icons/python/python-original.svg">
   <img align="center" alt="Bruno-Nodejs" height="50" width"60" src="https://raw.githubusercontent.com/devicons/devicon/master/icons/nodejs/nodejs-plain.svg">
   <img align="center" alt="Bruno-mySQL" height="50" width"60" src="https://raw.githubusercontent.com/devicons/devicon/master/icons/mysql/mysql-original-wordmark.svg">
-  <img align="center" alt="Bruno-Python" height="50" width"60" src="https://raw.githubusercontent.com/brno01/devicon/master/icons/python/python-original.svg">
-</div>
-
-##
-
-<b>Uso:<b>
-<div style="display: inline_block"><br>
-  <img align="" alt="WebStorm" height="50" width"60" src="https://raw.githubusercontent.com/Kek5chen/devicon/0a06ff51f0a88db2549bd71d63a5c5a2f2dc39d8/icons/webstorm/webstorm-original.svg">
-  <img align="" alt="VSCode" height="50" width"60" src="https://raw.githubusercontent.com/devicons/devicon/master/icons/vscode/vscode-original.svg">
-  <img align="" alt="Win11" height="50" width"60" src="https://raw.githubusercontent.com/brno01/devicon/master/icons/windows8/windows8-original.svg">
+  <img align="center" alt="TypeORM" height="50" width"60" src="https://raw.githubusercontent.com/typeorm/typeorm/master/resources/logo_big.png">
 </div>
 
  ##
