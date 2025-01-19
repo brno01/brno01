@@ -10,7 +10,7 @@
 </div>
 <p>
 
-<b>Estou estudando sobre:<b>
+<b>Estou estudando:<b>
 <div style="display: inline_block"><br>
   <!-- <img align="center" alt="Bruno-" height="50" width"60" src= -->
   <!-- <img align="center" alt="Bruno-" height="50" width"60" src= -->
