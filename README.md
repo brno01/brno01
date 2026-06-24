@@ -41,6 +41,6 @@
 
 <div align="center">
   <p>Feito com :heart:!
-  <p>Obrigado pela Visita!
+  <p>Obrigado pela visita!
 
 </div>
