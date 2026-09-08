@@ -1,6 +1,6 @@
 <div>
-  <h2 align="center">Oi! Me chamo <a href="https://www.linkedin.com/in/brno01oliveira/"><i>Bruno Oliveira</i></a>, e estou iniciando minha carreira como desenvolvedor back-end!</a> 😃️</h2>
-    <p align="center"> É um prazer te receber por aqui :eyes::heart: </div>
+  <h2 align="center">Oi! Me chamo <a href="https://www.linkedin.com/in/brno01oliveira/"><i>Bruno Oliveira</i></a>, e estou iniciando minha carreira como <br> desenvolvedor back-end </a></h2>
+    <p align="center"> É um prazer te receber por aqui :eyes: </div>
 <p>
 <div align="center">
   <a href="https://github.com/brno01">
