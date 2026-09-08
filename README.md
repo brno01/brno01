@@ -3,10 +3,8 @@
     <p align="center"> É um prazer te receber por aqui :eyes: </div>
 <p>
 <div align="center">
-  <a href="https://github.com/brno01">
     <img height="150em" src="https://github-stats-extended.vercel.app/api?username=brno01&hide_title=true&show_icons=true&include_all_commits=true&theme=radical"/>
     <img height="150em" src="https://github-stats-extended.vercel.app/api/top-langs?username=brno01&layout=compact&hide_title=true&langs_count=6&hide_values=true&theme=radical"/>
-  </a>
 </div>
 <p>
 
