@@ -1,5 +1,5 @@
 <div>
-  <h2 align="center">Oi! Me chamo <a href="https://www.linkedin.com/in/brno01oliveira/"><i>Bruno Oliveira</i></a>, e estou iniciando como desenvolvedor back-end!</a> 😃️</h2>
+  <h2 align="center">Oi! Me chamo <a href="https://www.linkedin.com/in/brno01oliveira/"><i>Bruno Oliveira</i></a>, e estou iniciando minha carreira como desenvolvedor back-end!</a> 😃️</h2>
     <p align="center"> É um prazer te receber por aqui :eyes::heart: </div>
 <p>
 <div align="center">
@@ -43,7 +43,7 @@
  ##
 
 <div align="center">
-  <p>Feito com :heart:!
+  <p>Feito com :heart:
   <p>Obrigado pela visita!
 
 </div>
