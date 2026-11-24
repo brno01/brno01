@@ -22,7 +22,7 @@ jobs:
           github_user_name: brno01
           svg_out_path: dist/github-contribution-grid-snake.svg
 
-      - uses: crazy-max/ghaction-github-pages@361b74e73ccac505c7b5bcbff9b7d6cb0510dc4e # v2.1.3
+      - uses: crazy-max/ghaction-github-pages@1d6ee9b181a81033a16bd707a1401afa978daab4 # v5.0.0
         with:
           target_branch: output
           build_dir: dist
