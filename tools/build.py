@@ -140,15 +140,18 @@ def derive_status(repos: dict, login: str) -> tuple[int, dict]:
 _STR, _LIST_STR = "str", "list[str]"
 CONTENT_SCHEMA = {
     "name": _STR, "lede": _STR, "about": _LIST_STR,
-    "also_private": _LIST_STR, "login": _STR, "assets_base": _STR,
+    "login": _STR, "assets_base": _STR,
     "contacts": [{"label": _STR, "url": _STR, "icon": _STR}],
     "projects": [{"slug": _STR, "url": _STR, "title": _STR, "desc": _STR, "desc_short": _STR,
                   "details": _STR, "stack": _LIST_STR, "alt": _STR, "repo": _STR}],
+    # private repositories: no link (visitors would get a 404) and no art, so the stack is plain text
+    "also_private": [{"title": _STR, "desc": _STR, "details": _STR, "stack": _LIST_STR}],
     "studies": [{"title": _STR, "url": _STR, "note": _STR}],
-    "stack": [{"group": _STR, "items": [{"name": _STR, "icon": _STR}]}],
+    # "icon" is optional: a technology without a simple-icons mark gets a plain chip
+    "stack": [{"group": _STR, "items": [{"name": _STR}]}],
     "labels": {k: _STR for k in ("updated", "about", "projects", "stack", "also_private", "studies", "hub",
                                  "contrib_line", "public_repos", "last_push", "most_recent",
-                                 "projects_details")},
+                                 "projects_details", "private_details")},
     "alt": {"hero": _STR},
     "english": {"summary": _STR, "heading": _STR, "lede": _STR, "about": _LIST_STR, "closing": _STR},
 }
@@ -180,15 +183,16 @@ def validate_content(content) -> None:
     _check_shape(content, CONTENT_SCHEMA, "")
     # same rule as the file-name check of the publish job; also keeps the README URLs clean
     named = [(c["label"], c["icon"]) for c in content["contacts"]]
-    named += [(i["name"], i["icon"]) for g in content["stack"] for i in g["items"]]
+    named += [(i["name"], i["icon"]) for g in content["stack"] for i in g["items"] if "icon" in i]
     for name, icon in named:
-        if not SLUG.fullmatch(icon):
+        if not isinstance(icon, str) or not SLUG.fullmatch(icon):
             raise BuildError(f"content.json: ícone {icon!r} de {name} inválido (use [a-z0-9][a-z0-9-]*)")
 
 
 def icon_slugs(content: dict) -> list[str]:
     """Icon slugs used by the contact and stack chips, without repeats, sorted."""
-    return sorted({c["icon"] for c in content["contacts"]} | {i["icon"] for g in content["stack"] for i in g["items"]})
+    return sorted({c["icon"] for c in content["contacts"]}
+                  | {i["icon"] for g in content["stack"] for i in g["items"] if "icon" in i})
 
 
 class Ctx:
@@ -364,7 +368,17 @@ def load_icon_meta(icons_dir: Path = ICONS_DIR) -> dict:
 
 
 def read_icon_path(slug: str, icons_dir: Path = ICONS_DIR) -> str:
-    """The ``d`` of a simple-icons SVG, after checking that the file has exactly the expected shape."""
+    """The ``d`` of an icon SVG, after checking that the file has exactly the expected shape."""
+    return read_icon(slug, icons_dir)[0]
+
+
+# accepted source shapes: a square viewBox of one of these sides (simple-icons and Material Symbols
+# draw on 24, devicon on 128, the Apache Camel mark on 256) and one <path>, after an optional <title>
+ICON_BOXES = {f"0 0 {n} {n}": n for n in (24, 128, 256)}
+
+
+def read_icon(slug: str, icons_dir: Path = ICONS_DIR) -> tuple[str, int]:
+    """The ``d`` of an icon SVG and the side of its square viewBox."""
     import xml.etree.ElementTree as ET
     ns = "{http://www.w3.org/2000/svg}"
     path = icons_dir / f"{slug}.svg"
@@ -374,14 +388,15 @@ def read_icon_path(slug: str, icons_dir: Path = ICONS_DIR) -> str:
         raise BuildError(f"ícone {slug}: não consegui ler {path.name}: {e}") from e
     if root.tag != ns + "svg":
         raise BuildError(f"ícone {slug}: a raiz deve ser <svg>")
-    if root.get("viewBox") != "0 0 24 24":
-        raise BuildError(f"ícone {slug}: viewBox deve ser '0 0 24 24', veio {root.get('viewBox')!r}")
-    if [k.tag for k in root] != [ns + "title", ns + "path"]:
-        raise BuildError(f"ícone {slug}: o <svg> deve ter exatamente <title> e <path>")
+    box = root.get("viewBox")
+    if box not in ICON_BOXES:
+        raise BuildError(f"ícone {slug}: viewBox deve ser quadrado de lado 24, 128 ou 256, veio {box!r}")
+    if [k.tag for k in root] not in ([ns + "title", ns + "path"], [ns + "path"]):
+        raise BuildError(f"ícone {slug}: o <svg> deve ter exatamente um <path>, depois de um <title> opcional")
     d = root.find(ns + "path").get("d")
     if d is None or not SVG_PATH_D.fullmatch(d):
         raise BuildError(f"ícone {slug}: o atributo d do <path> tem caracteres inesperados")
-    return d
+    return d, ICON_BOXES[box]
 
 
 def _rgb(h: str) -> list[float]:
@@ -414,14 +429,16 @@ def icon_color(hexcolor: str, theme: str) -> str:
     return _mix(h, target, t)
 
 
-def icon_svg(slug: str, meta: dict, d: str, theme: str) -> bytes:
+def icon_svg(slug: str, meta: dict, d: str, theme: str, box: int = 24) -> bytes:
     letters = meta["letters"]
+    if letters and box != 24:
+        raise BuildError(f"ícone {slug}: letters só vale para ícones de 24x24")
     if letters:  # a square logo: fill behind the letters so it reads as the real mark on any chip
         fill = meta["hex"].lower()
         back = f'<rect x="1" y="1" width="22" height="22" fill="#{letters}"/>'
     else:
         fill, back = icon_color(meta["hex"], theme), ""
-    return (f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true">'
+    return (f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {box} {box}" width="24" height="24" aria-hidden="true">'
             f'{back}<path fill="#{fill}" d="{d}"/></svg>\n').encode("utf-8")
 
 
@@ -432,9 +449,9 @@ def emit_icons(ctx, icons_dir: Path = ICONS_DIR) -> None:
             raise BuildError(f"ícone {slug!r}: nome inválido (use [a-z0-9][a-z0-9-]*)")
         if slug not in meta:
             raise BuildError(f"ícone {slug}: falta em {icons_dir.name}/icons.json")
-        d = read_icon_path(slug, icons_dir)
+        d, box = read_icon(slug, icons_dir)
         for theme in ("light", "dark"):
-            ctx.emit_raw(f"icon-{slug}-{theme}.svg", icon_svg(slug, meta[slug], d, theme))
+            ctx.emit_raw(f"icon-{slug}-{theme}.svg", icon_svg(slug, meta[slug], d, theme, box))
 
 
 # ------------------------------------------------------------------ text helpers
@@ -691,7 +708,9 @@ def render_readme(content: dict) -> str:
     def pic(name: str, alt: str) -> str:
         return K.picture(name, alt, base)
 
-    def chip(slug: str, text: str) -> str:
+    def chip(slug: str | None, text: str) -> str:
+        if slug is None:
+            return f"<kbd>{e(text)}</kbd>"
         return (f'<kbd><picture><source media="(prefers-color-scheme: dark)" srcset="{base}/icon-{slug}-dark.svg">'
                 f'<img src="{base}/icon-{slug}-light.svg" width="11" height="11" alt="" align="top"></picture> '
                 f'{e(text)}</kbd>')
@@ -712,13 +731,18 @@ def render_readme(content: dict) -> str:
     blocks.append(f'<details>\n<summary><b>{e(lab["projects_details"])}</b></summary>\n\n'
                   + "\n".join(f'- **[{e(p["title"])}]({p["url"]})**: {e(p["details"])}' for p in content["projects"])
                   + "\n\n</details>")
+    private = content["also_private"]
     blocks.append(f'**{lab["also_private"]}**')
-    blocks.append("\n".join(f"- {e(t)}" for t in content["also_private"]))
+    blocks.append("\n".join(
+        f'- **{e(p["title"])}**: {e(p["desc"])}<br>\n  <sub>{e(", ".join(p["stack"]))}</sub>' for p in private))
+    blocks.append(f'<details>\n<summary><b>{e(lab["private_details"])}</b></summary>\n\n'
+                  + "\n".join(f'- **{e(p["title"])}**: {e(p["details"])}' for p in private)
+                  + "\n\n</details>")
     blocks.append(f'**{lab["studies"]}:** ' + ", ".join(
         f'[{e(s["title"])}]({s["url"]}) ({e(s["note"])})' for s in content["studies"]))
     blocks.append(f'## {lab["stack"]}')
     for gr in content["stack"]:
-        blocks.append(f'**{e(gr["group"])}**<br>\n' + " ".join(chip(i["icon"], i["name"]) for i in gr["items"]))
+        blocks.append(f'**{e(gr["group"])}**<br>\n' + " ".join(chip(i.get("icon"), i["name"]) for i in gr["items"]))
     en = content["english"]
     blocks.append(
         f'<details>\n<summary><b>{e(en["summary"])}</b></summary>\n\n### {e(en["heading"])}\n\n{e(en["lede"])}\n\n'

@@ -119,8 +119,65 @@
     }
   ],
   "also_private": [
-    "Homelab como código: contêineres, stack de IA local, servidores de jogo, backups e os scripts que instalam e vigiam tudo.",
-    "App desktop modular em React e Tauri/Rust para ferramentas internas, com autenticação central e execução de integrações auditada."
+    {
+      "title": "homelab",
+      "desc": "Homelab como código: contêineres, stack de IA local, servidores de jogo, backups e os scripts que instalam e vigiam tudo.",
+      "details": "Um servidor doméstico descrito em código. Cada serviço roda num contêiner Incus, e um balanceador decide quanta memória cada um recebe. Traz a stack de IA local (Ollama, Open WebUI e fluxos do n8n), servidores de jogo, cofre de senhas, NAS com backup, um painel web em React e guardiões em Python que vigiam energia, temperatura e rede e só corrigem o que saiu do lugar.",
+      "stack": [
+        "Python",
+        "TypeScript",
+        "React",
+        "Vite",
+        "Bash",
+        "Incus",
+        "systemd",
+        "Ollama",
+        "n8n",
+        "Tailscale",
+        "Vitest",
+        "Playwright"
+      ]
+    },
+    {
+      "title": "duna",
+      "desc": "App desktop modular em React e Tauri/Rust para ferramentas internas, com autenticação central e execução de integrações auditada.",
+      "details": "Reúne ferramentas internas num app desktop nativo no Windows. A interface é React com Vite; o núcleo em Rust (Tauri) guarda a sessão e expõe 26 comandos, cada um com sua permissão. Uma API em Rust (Axum e sqlx) sobre o PostgreSQL do Supabase centraliza login, papéis, credenciais e auditoria. Cada módulo tem configuração isolada e pode vir em código ou ser criado pela interface. Testes com Vitest e WebdriverIO.",
+      "stack": [
+        "TypeScript",
+        "React",
+        "Vite",
+        "Rust",
+        "Tauri",
+        "Axum",
+        "PostgreSQL",
+        "Supabase",
+        "Vitest",
+        "WebdriverIO"
+      ]
+    },
+    {
+      "title": "dotfiles",
+      "desc": "Ambiente de desenvolvimento e configuração do Claude Code, versionados e prontos para uma máquina nova.",
+      "details": "A configuração do Claude Code (agentes com modelo fixo por tipo de tarefa, skills, hooks e status line), as ferramentas de shell e o perfil de um servidor de desenvolvimento remoto, com sessões tmux por repositório e por tarefa. Um instalador que pode rodar de novo sem efeito colateral liga tudo por symlink, e serviços do systemd mantêm espelhos e painéis de uso em dia.",
+      "stack": [
+        "Python",
+        "Bash",
+        "Claude Code",
+        "tmux",
+        "systemd",
+        "pytest"
+      ]
+    },
+    {
+      "title": "tailnet-policy",
+      "desc": "Política de acesso da tailnet como código, testada no PR e aplicada no merge.",
+      "details": "A ACL do Tailscale vive num arquivo HuJSON versionado. Cada PR testa a política na própria Tailscale e o merge a aplica. Antes disso, um script recusa o arquivo de exemplo e valida a sintaxe, localmente e no CI, e um hook bloqueia segredos no commit.",
+      "stack": [
+        "Tailscale",
+        "GitHub Actions",
+        "Bash"
+      ]
+    }
   ],
   "studies": [
     {
@@ -144,12 +201,24 @@
       "group": "Linguagens",
       "items": [
         {
+          "name": "TypeScript",
+          "icon": "typescript"
+        },
+        {
+          "name": "Dart",
+          "icon": "dart"
+        },
+        {
           "name": "Python",
           "icon": "python"
         },
         {
-          "name": "TypeScript",
-          "icon": "typescript"
+          "name": "Rust",
+          "icon": "rust"
+        },
+        {
+          "name": "SQL",
+          "icon": "sql"
         },
         {
           "name": "JavaScript",
@@ -158,15 +227,20 @@
         {
           "name": "Bash",
           "icon": "gnubash"
-        },
-        {
-          "name": "Rust",
-          "icon": "rust"
         }
       ]
     },
     {
-      "group": "Back-end",
+      "group": "Mobile",
+      "items": [
+        {
+          "name": "Flutter",
+          "icon": "flutter"
+        }
+      ]
+    },
+    {
+      "group": "Back-end e integração",
       "items": [
         {
           "name": "Node.js",
@@ -177,9 +251,30 @@
           "icon": "nestjs"
         },
         {
+          "name": "Fastify",
+          "icon": "fastify"
+        },
+        {
           "name": "Express",
           "icon": "express"
         },
+        {
+          "name": "Axum",
+          "icon": "tokio"
+        },
+        {
+          "name": "Apache Camel",
+          "icon": "apachecamel"
+        },
+        {
+          "name": "Swagger",
+          "icon": "swagger"
+        }
+      ]
+    },
+    {
+      "group": "Dados",
+      "items": [
         {
           "name": "PostgreSQL",
           "icon": "postgresql"
@@ -187,6 +282,22 @@
         {
           "name": "MySQL",
           "icon": "mysql"
+        },
+        {
+          "name": "MariaDB",
+          "icon": "mariadb"
+        },
+        {
+          "name": "Redis",
+          "icon": "redis"
+        },
+        {
+          "name": "Supabase",
+          "icon": "supabase"
+        },
+        {
+          "name": "TypeORM",
+          "icon": "typeorm"
         }
       ]
     },
@@ -202,18 +313,18 @@
           "icon": "vite"
         },
         {
+          "name": "TanStack Query",
+          "icon": "reactquery"
+        },
+        {
           "name": "Tauri",
           "icon": "tauri"
         }
       ]
     },
     {
-      "group": "Testes",
+      "group": "Testes e qualidade",
       "items": [
-        {
-          "name": "pytest",
-          "icon": "pytest"
-        },
         {
           "name": "Vitest",
           "icon": "vitest"
@@ -221,11 +332,31 @@
         {
           "name": "Jest",
           "icon": "jest"
+        },
+        {
+          "name": "pytest",
+          "icon": "pytest"
+        },
+        {
+          "name": "Testing Library",
+          "icon": "testinglibrary"
+        },
+        {
+          "name": "MSW",
+          "icon": "mockserviceworker"
+        },
+        {
+          "name": "Playwright",
+          "icon": "playwright"
+        },
+        {
+          "name": "WebdriverIO",
+          "icon": "webdriverio"
         }
       ]
     },
     {
-      "group": "Infra e ferramentas",
+      "group": "Infra e DevOps",
       "items": [
         {
           "name": "Linux",
@@ -240,20 +371,62 @@
           "icon": "podman"
         },
         {
+          "name": "Incus",
+          "icon": "linuxcontainers"
+        },
+        {
+          "name": "systemd",
+          "icon": "systemd"
+        },
+        {
           "name": "Tailscale",
           "icon": "tailscale"
         },
         {
           "name": "GitHub Actions",
           "icon": "githubactions"
+        }
+      ]
+    },
+    {
+      "group": "Automação e IA",
+      "items": [
+        {
+          "name": "n8n",
+          "icon": "n8n"
         },
+        {
+          "name": "pandas",
+          "icon": "pandas"
+        },
+        {
+          "name": "Ollama",
+          "icon": "ollama"
+        },
+        {
+          "name": "Claude Code",
+          "icon": "claude"
+        }
+      ]
+    },
+    {
+      "group": "Ferramentas",
+      "items": [
         {
           "name": "Git",
           "icon": "git"
         },
         {
-          "name": "Claude Code",
-          "icon": "claude"
+          "name": "Bitbucket",
+          "icon": "bitbucket"
+        },
+        {
+          "name": "tmux",
+          "icon": "tmux"
+        },
+        {
+          "name": "uv",
+          "icon": "uv"
         }
       ]
     }
@@ -270,7 +443,8 @@
     "public_repos": "projetos públicos",
     "last_push": "último push",
     "most_recent": "mais recente",
-    "projects_details": "Detalhes dos projetos"
+    "projects_details": "Detalhes dos projetos",
+    "private_details": "Detalhes dos privados"
   },
   "alt": {
     "hero": "Bruno Oliveira, desenvolvedor mobile e back-end, com foco em automação e infraestrutura. Arte de abertura do perfil."
