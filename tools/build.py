@@ -3,7 +3,7 @@
 # requires-python = ">=3.11"
 # dependencies = ["fonttools==4.69.1"]
 # ///
-"""Profile README generator: the 58 SVG art files and README.md.
+"""Profile README generator: the 66 SVG art files and README.md.
 
     tools/build.py assets --snapshot FILE --out DIR   write the SVG files (flat) into DIR
     tools/build.py readme [--check]                   write README.md (--check only compares)
@@ -139,7 +139,7 @@ _STR, _LIST_STR = "str", "list[str]"
 CONTENT_SCHEMA = {
     "name": _STR, "lede": _STR, "about": _LIST_STR,
     "also_private": _LIST_STR, "login": _STR, "assets_base": _STR, "footer": _STR,
-    "contacts": [{"label": _STR, "url": _STR}],
+    "contacts": [{"label": _STR, "url": _STR, "icon": _STR}],
     "projects": [{"slug": _STR, "url": _STR, "title": _STR, "desc": _STR, "desc_short": _STR,
                   "stack": _LIST_STR, "alt": _STR, "repo": _STR}],
     "studies": [{"title": _STR, "url": _STR, "note": _STR}],
@@ -176,15 +176,16 @@ def validate_content(content) -> None:
     """Check that every key the generator reads exists in content.json, with the right type."""
     _check_shape(content, CONTENT_SCHEMA, "")
     # same rule as the file-name check of the publish job; also keeps the README URLs clean
-    for g in content["stack"]:
-        for item in g["items"]:
-            if not SLUG.fullmatch(item["icon"]):
-                raise BuildError(f'content.json: ícone {item["icon"]!r} de {item["name"]} inválido (use [a-z0-9][a-z0-9-]*)')
+    named = [(c["label"], c["icon"]) for c in content["contacts"]]
+    named += [(i["name"], i["icon"]) for g in content["stack"] for i in g["items"]]
+    for name, icon in named:
+        if not SLUG.fullmatch(icon):
+            raise BuildError(f"content.json: ícone {icon!r} de {name} inválido (use [a-z0-9][a-z0-9-]*)")
 
 
-def stack_icon_slugs(content: dict) -> list[str]:
-    """Icon slugs used by the stack chips, without repeats, sorted."""
-    return sorted({i["icon"] for g in content["stack"] for i in g["items"]})
+def icon_slugs(content: dict) -> list[str]:
+    """Icon slugs used by the contact and stack chips, without repeats, sorted."""
+    return sorted({c["icon"] for c in content["contacts"]} | {i["icon"] for g in content["stack"] for i in g["items"]})
 
 
 class Ctx:
@@ -410,7 +411,7 @@ def icon_color(hexcolor: str, theme: str) -> str:
     return _mix(h, target, t)
 
 
-def stack_icon_svg(slug: str, meta: dict, d: str, theme: str) -> bytes:
+def icon_svg(slug: str, meta: dict, d: str, theme: str) -> bytes:
     letters = meta["letters"]
     if letters:  # a square logo: fill behind the letters so it reads as the real mark on any chip
         fill = meta["hex"].lower()
@@ -421,16 +422,16 @@ def stack_icon_svg(slug: str, meta: dict, d: str, theme: str) -> bytes:
             f'{back}<path fill="#{fill}" d="{d}"/></svg>\n').encode("utf-8")
 
 
-def stack_icons(ctx, icons_dir: Path = ICONS_DIR) -> None:
+def emit_icons(ctx, icons_dir: Path = ICONS_DIR) -> None:
     meta = load_icon_meta(icons_dir)
-    for slug in stack_icon_slugs(ctx.copy):
+    for slug in icon_slugs(ctx.copy):
         if not SLUG.fullmatch(slug):
             raise BuildError(f"ícone {slug!r}: nome inválido (use [a-z0-9][a-z0-9-]*)")
         if slug not in meta:
             raise BuildError(f"ícone {slug}: falta em {icons_dir.name}/icons.json")
         d = read_icon_path(slug, icons_dir)
         for theme in ("light", "dark"):
-            ctx.emit_raw(f"stack-{slug}-{theme}.svg", stack_icon_svg(slug, meta[slug], d, theme))
+            ctx.emit_raw(f"icon-{slug}-{theme}.svg", icon_svg(slug, meta[slug], d, theme))
 
 
 # ------------------------------------------------------------------ text helpers
@@ -651,10 +652,10 @@ def generate(snap: dict, content: dict) -> Ctx:
                 hero(ctx, dev, th)
                 for p in ctx.projects:
                     proj(ctx, dev, th, p)
-        stack_icons(ctx)
+        emit_icons(ctx)
     except ValueError as e:  # svgkit: character without a glyph, SVG too big or malformed
         raise BuildError(str(e)) from e
-    expected = 4 + 4 * len(ctx.projects) + 2 * len(stack_icon_slugs(content))
+    expected = 4 + 4 * len(ctx.projects) + 2 * len(icon_slugs(content))
     if len(ctx.files) != expected:
         raise BuildError(f"gerei {len(ctx.files)} arquivos, esperava {expected}")
     return ctx
@@ -686,18 +687,17 @@ def render_readme(content: dict) -> str:
     def pic(name: str, alt: str) -> str:
         return K.picture(name, alt, base)
 
-    def chip(item: dict) -> str:
-        slug = item["icon"]
-        return (f'<kbd><picture><source media="(prefers-color-scheme: dark)" srcset="{base}/stack-{slug}-dark.svg">'
-                f'<img src="{base}/stack-{slug}-light.svg" width="11" height="11" alt="" align="top"></picture> '
-                f'{e(item["name"])}</kbd>')
+    def chip(slug: str, text: str) -> str:
+        return (f'<kbd><picture><source media="(prefers-color-scheme: dark)" srcset="{base}/icon-{slug}-dark.svg">'
+                f'<img src="{base}/icon-{slug}-light.svg" width="11" height="11" alt="" align="top"></picture> '
+                f'{e(text)}</kbd>')
 
     blocks = [
         "<!-- Arquivo gerado por tools/build.py a partir de tools/content.json. "
         "Não edite à mão: edite o JSON e rode `uv run tools/build.py readme`. -->",
         "<p>\n" + pic("hero", content["alt"]["hero"]) + "\n</p>",
         e(content["lede"]),
-        "<p>" + " ".join(f'<a href="{e(x["url"])}"><kbd>{e(x["label"])}</kbd></a>' for x in content["contacts"]) + "</p>",
+        "<p>" + " ".join(f'<a href="{e(x["url"])}">{chip(x["icon"], x["label"])}</a>' for x in content["contacts"]) + "</p>",
         f'## {lab["about"]}',
     ]
     blocks += [e(t) for t in content["about"]]
@@ -710,7 +710,7 @@ def render_readme(content: dict) -> str:
         f'[{e(s["title"])}]({s["url"]}) ({e(s["note"])})' for s in content["studies"]))
     blocks.append(f'## {lab["stack"]}')
     for gr in content["stack"]:
-        blocks.append(f'**{e(gr["group"])}**<br>\n' + " ".join(chip(i) for i in gr["items"]))
+        blocks.append(f'**{e(gr["group"])}**<br>\n' + " ".join(chip(i["icon"], i["name"]) for i in gr["items"]))
     en = content["english"]
     blocks.append(
         f'<details>\n<summary><b>{e(en["summary"])}</b></summary>\n\n### {e(en["heading"])}\n\n{e(en["lede"])}\n\n'

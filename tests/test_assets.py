@@ -8,7 +8,7 @@ SVG_NS = "{http://www.w3.org/2000/svg}"
 GITHUB_BG = {"dark": "#0d1117", "light": "#ffffff"}
 CHIP_BG = {"dark": "#151b23", "light": "#f6f8fa"}
 ART = re.compile(r"(hero|proj-.+)-(desktop|mobile)-(dark|light)\.svg")
-ICON = re.compile(r"stack-([a-z0-9-]+)-(light|dark)\.svg")
+ICON = re.compile(r"icon-([a-z0-9-]+)-(light|dark)\.svg")
 
 
 def _art(assets):
@@ -25,13 +25,13 @@ def _split(name):
 
 def test_expected_file_set(assets, content):
     slugs = [p["slug"] for p in content["projects"]]
-    icons = sorted({i["icon"] for g in content["stack"] for i in g["items"]})
+    icons = sorted({c["icon"] for c in content["contacts"]} | {i["icon"] for g in content["stack"] for i in g["items"]})
     art = {f"{k}-{d}-{t}.svg" for k in ["hero"] + [f"proj-{s}" for s in slugs]
            for d in ("desktop", "mobile") for t in ("dark", "light")}
-    stack = {f"stack-{i}-{t}.svg" for i in icons for t in ("light", "dark")}
-    assert len(slugs) == 6 and len(icons) == 15
-    assert len(art) == 28 and len(stack) == 30
-    assert set(assets) == art | stack and len(assets) == 58
+    stack = {f"icon-{i}-{t}.svg" for i in icons for t in ("light", "dark")}
+    assert len(slugs) == 6 and len(icons) == 19
+    assert len(art) == 28 and len(stack) == 38
+    assert set(assets) == art | stack and len(assets) == 66
     assert not any(n.startswith("activity-") for n in assets)
 
 
@@ -96,7 +96,7 @@ def test_art_has_role_img_and_label(assets, content):
 
 def test_icons_are_decorative(assets):
     icons = _icons(assets)
-    assert len(icons) == 30
+    assert len(icons) == 38
     for name, text in icons.items():
         root = ET.fromstring(text)
         assert root.get("aria-hidden") == "true", name
@@ -159,7 +159,7 @@ def test_icon_themes_differ_only_in_the_fill(assets):
         slug, theme = ICON.fullmatch(name).groups()
         if theme != "dark":
             continue
-        light = assets[f"stack-{slug}-light.svg"]
+        light = assets[f"icon-{slug}-light.svg"]
         strip = lambda t: re.sub(r'(<path fill=")#[0-9a-f]{6}', r"\1#", t)  # noqa: E731
         assert strip(dark) == strip(light), slug
 
