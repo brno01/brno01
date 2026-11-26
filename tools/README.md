@@ -61,7 +61,7 @@ uv run --with-requirements tools/requirements.txt pytest -q
 
 ## Editar o conteúdo
 
-1. Edite `tools/content.json` (textos, projetos, contatos, rodapé).
+1. Edite `tools/content.json` (textos, projetos, contatos).
 2. Rode `uv run tools/build.py readme` e versione o `README.md` junto.
 
 O teste `test_readme_is_up_to_date` e o passo `readme --check` do workflow falham se o
