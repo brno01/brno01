@@ -8,7 +8,7 @@
       "icon": "linkedin"
     },
     {
-      "label": "Repositórios",
+      "label": "View my repos",
       "url": "https://github.com/brno01?tab=repositories",
       "icon": "github"
     },
@@ -24,7 +24,7 @@
     }
   ],
   "about": [
-    "Trabalho com suporte técnico N2 e estou migrando para desenvolvimento. Fora do expediente, mantenho um homelab tratado como produção: tudo versionado, instalado por script, com testes, CI de segurança em cada push e revisão antes do merge.",
+    "Trabalho com desenvolvimento mobile e back-end, vindo do suporte técnico N2. Fora do expediente, mantenho um homelab tratado como produção: tudo versionado, instalado por script, com testes, CI de segurança em cada push e revisão antes do merge.",
     "Gosto de problemas que juntam código e sistema: servidores, redes, automações e as ferramentas que deixam tudo isso fácil de operar."
   ],
   "projects": [
@@ -236,6 +236,5 @@
     "closing": "The projects above are the best place to start. Each repository has its own README, CI and security scan."
   },
   "login": "brno01",
-  "assets_base": "https://raw.githubusercontent.com/brno01/brno01/output/",
-  "footer": "Este README é gerado: a arte e os números vêm de tools/build.py e são refeitos todo dia por uma GitHub Action."
+  "assets_base": "https://raw.githubusercontent.com/brno01/brno01/output/"
 }
