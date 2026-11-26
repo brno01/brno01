@@ -1,6 +1,6 @@
 {
   "name": "Bruno Oliveira",
-  "lede": "Desenvolvedor back-end com foco em automação e infraestrutura: Linux, homelab como código, CI/CD e integrações em Python e TypeScript.",
+  "lede": "Desenvolvedor mobile e back-end, com foco em automação e infraestrutura: Linux, homelab como código, CI/CD e integrações em Python e TypeScript.",
   "contacts": [
     {
       "label": "LinkedIn",
@@ -273,14 +273,14 @@
     "projects_details": "Detalhes dos projetos"
   },
   "alt": {
-    "hero": "Bruno Oliveira, desenvolvedor back-end em automação e infraestrutura. Arte de abertura do perfil."
+    "hero": "Bruno Oliveira, desenvolvedor mobile e back-end, com foco em automação e infraestrutura. Arte de abertura do perfil."
   },
   "english": {
     "summary": "English",
     "heading": "Bruno Oliveira",
-    "lede": "Back-end developer focused on automation and infrastructure: Linux, homelab as code, CI/CD and integrations in Python and TypeScript.",
+    "lede": "Mobile and back-end developer focused on automation and infrastructure: Linux, homelab as code, CI/CD and integrations in Python and TypeScript.",
     "about": [
-      "I work in tier-2 technical support and I am moving into software development. Off the clock I run a homelab the way I would run production: everything versioned, installed by script, tested, security-scanned on every push and reviewed before merging. I enjoy problems where code meets the system: servers, networks, automation and the tools that make all of it easy to operate."
+      "I work in mobile and back-end development, coming from tier-2 technical support. Off the clock I run a homelab the way I would run production: everything versioned, installed by script, tested, security-scanned on every push and reviewed before merging. I enjoy problems where code meets the system: servers, networks, automation and the tools that make all of it easy to operate."
     ],
     "closing": "The projects above are the best place to start. Each repository has its own README, CI and security scan."
   },

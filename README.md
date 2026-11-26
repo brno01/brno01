@@ -5,17 +5,17 @@
   <source media="(max-width: 767px) and (prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/brno01/brno01/output/hero-mobile-dark.svg">
   <source media="(max-width: 767px)" srcset="https://raw.githubusercontent.com/brno01/brno01/output/hero-mobile-light.svg">
   <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/brno01/brno01/output/hero-desktop-dark.svg">
-  <img src="https://raw.githubusercontent.com/brno01/brno01/output/hero-desktop-light.svg" width="100%" alt="Bruno Oliveira, desenvolvedor back-end em automação e infraestrutura. Arte de abertura do perfil.">
+  <img src="https://raw.githubusercontent.com/brno01/brno01/output/hero-desktop-light.svg" width="100%" alt="Bruno Oliveira, desenvolvedor mobile e back-end, com foco em automação e infraestrutura. Arte de abertura do perfil.">
 </picture>
 </p>
 
-Desenvolvedor back-end com foco em automação e infraestrutura: Linux, homelab como código, CI/CD e integrações em Python e TypeScript.
+Desenvolvedor mobile e back-end, com foco em automação e infraestrutura: Linux, homelab como código, CI/CD e integrações em Python e TypeScript.
 
 <p><a href="https://www.linkedin.com/in/brno01oliveira/"><kbd><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/brno01/brno01/output/icon-linkedin-dark.svg"><img src="https://raw.githubusercontent.com/brno01/brno01/output/icon-linkedin-light.svg" width="11" height="11" alt="" align="top"></picture> LinkedIn</kbd></a> <a href="https://github.com/brno01?tab=repositories"><kbd><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/brno01/brno01/output/icon-github-dark.svg"><img src="https://raw.githubusercontent.com/brno01/brno01/output/icon-github-light.svg" width="11" height="11" alt="" align="top"></picture> Repositórios</kbd></a> <a href="mailto:contato.bruno0dev@gmail.com"><kbd><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/brno01/brno01/output/icon-gmail-dark.svg"><img src="https://raw.githubusercontent.com/brno01/brno01/output/icon-gmail-light.svg" width="11" height="11" alt="" align="top"></picture> E-mail</kbd></a> <a href="https://discord.gg/nQEaSHMcnp"><kbd><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/brno01/brno01/output/icon-discord-dark.svg"><img src="https://raw.githubusercontent.com/brno01/brno01/output/icon-discord-light.svg" width="11" height="11" alt="" align="top"></picture> Discord</kbd></a></p>
 
 ## Sobre
 
-Trabalho com suporte técnico N2 e estou migrando para desenvolvimento. Fora do expediente, mantenho um homelab tratado como produção: tudo versionado, instalado por script, com testes, CI de segurança em cada push e revisão antes do merge.
+Trabalho com desenvolvimento mobile e back-end, vindo do suporte técnico N2. Fora do expediente, mantenho um homelab tratado como produção: tudo versionado, instalado por script, com testes, CI de segurança em cada push e revisão antes do merge.
 
 Gosto de problemas que juntam código e sistema: servidores, redes, automações e as ferramentas que deixam tudo isso fácil de operar.
 
@@ -113,9 +113,9 @@ Gosto de problemas que juntam código e sistema: servidores, redes, automações
 
 ### Bruno Oliveira
 
-Back-end developer focused on automation and infrastructure: Linux, homelab as code, CI/CD and integrations in Python and TypeScript.
+Mobile and back-end developer focused on automation and infrastructure: Linux, homelab as code, CI/CD and integrations in Python and TypeScript.
 
-I work in tier-2 technical support and I am moving into software development. Off the clock I run a homelab the way I would run production: everything versioned, installed by script, tested, security-scanned on every push and reviewed before merging. I enjoy problems where code meets the system: servers, networks, automation and the tools that make all of it easy to operate.
+I work in mobile and back-end development, coming from tier-2 technical support. Off the clock I run a homelab the way I would run production: everything versioned, installed by script, tested, security-scanned on every push and reviewed before merging. I enjoy problems where code meets the system: servers, networks, automation and the tools that make all of it easy to operate.
 
 The projects above are the best place to start. Each repository has its own README, CI and security scan.
 
