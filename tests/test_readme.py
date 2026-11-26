@@ -154,7 +154,7 @@ def test_contacts_are_kbd_links_with_an_icon_and_no_arrow(readme, content):
     assert "↗" not in readme
     base = content["assets_base"].rstrip("/")
     labels = [c["label"] for c in content["contacts"]]
-    assert labels == ["LinkedIn", "Repositórios", "E-mail", "Discord"]
+    assert labels == ["LinkedIn", "View my repos", "E-mail", "Discord"]
     for c in content["contacts"]:
         chip = (f'<a href="{c["url"]}"><kbd><picture><source media="(prefers-color-scheme: dark)" '
                 f'srcset="{base}/icon-{c["icon"]}-dark.svg"><img src="{base}/icon-{c["icon"]}-light.svg" '
@@ -167,7 +167,7 @@ def test_section_order_and_no_activity_section(readme, content):
     marks = [readme.index(m) for m in (
         "<picture>", content["lede"], f'## {lab["about"]}', f'## {lab["projects"]}', f'<b>{lab["projects_details"]}</b>',
         f'**{lab["also_private"]}**', f'**{lab["studies"]}:**', f'## {lab["stack"]}',
-        f'<b>{content["english"]["summary"]}</b>', "<sub>")]
+        f'<b>{content["english"]["summary"]}</b>')]
     assert marks == sorted(marks)
     assert readme.index("<picture>") < readme.index(content["lede"])
     assert "Atividade" not in readme and "activity" not in readme.lower()
@@ -222,3 +222,7 @@ def test_project_details_are_one_collapsed_list(readme, content):
 def test_readme_names_no_dns_server_or_os_of_a_machine(readme):
     low = readme.lower()
     assert "pi-hole" not in low and "bazzite" not in low
+
+
+def test_readme_has_no_footer(readme):
+    assert "<sub>" not in readme

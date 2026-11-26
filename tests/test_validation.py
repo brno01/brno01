@@ -100,8 +100,8 @@ def test_missing_content_key_names_the_path(build, content, snapshot_data):
     del bad["labels"]["hub"]
     assert "labels.hub" in _gen_error(build, bad, snapshot_data)
     bad = _copy(content)
-    del bad["footer"]
-    assert "footer" in _gen_error(build, bad, snapshot_data)
+    del bad["assets_base"]
+    assert "assets_base" in _gen_error(build, bad, snapshot_data)
 
 
 def test_stack_item_must_be_an_object_with_name_and_icon(build, content, snapshot_data):

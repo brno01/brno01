@@ -140,7 +140,7 @@ def derive_status(repos: dict, login: str) -> tuple[int, dict]:
 _STR, _LIST_STR = "str", "list[str]"
 CONTENT_SCHEMA = {
     "name": _STR, "lede": _STR, "about": _LIST_STR,
-    "also_private": _LIST_STR, "login": _STR, "assets_base": _STR, "footer": _STR,
+    "also_private": _LIST_STR, "login": _STR, "assets_base": _STR,
     "contacts": [{"label": _STR, "url": _STR, "icon": _STR}],
     "projects": [{"slug": _STR, "url": _STR, "title": _STR, "desc": _STR, "desc_short": _STR,
                   "details": _STR, "stack": _LIST_STR, "alt": _STR, "repo": _STR}],
@@ -723,8 +723,6 @@ def render_readme(content: dict) -> str:
     blocks.append(
         f'<details>\n<summary><b>{e(en["summary"])}</b></summary>\n\n### {e(en["heading"])}\n\n{e(en["lede"])}\n\n'
         + "\n\n".join(e(t) for t in en["about"]) + f'\n\n{e(en["closing"])}\n\n</details>')
-    footer = e(content["footer"]).replace("tools/build.py", '<a href="tools/build.py">tools/build.py</a>')
-    blocks.append(f"<p><sub>{footer}</sub></p>")
     return "\n\n".join(blocks) + "\n"
 
 
