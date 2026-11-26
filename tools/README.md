@@ -1,20 +1,35 @@
 # Gerador do README de perfil
 
 Este diretório gera o `README.md` do perfil e a arte em SVG que ele mostra. Nenhum SVG fica
-versionado: uma GitHub Action refaz os 32 arquivos todo dia e os publica na branch `output`,
+versionado: uma GitHub Action refaz os 58 arquivos todo dia e os publica na branch `output`,
 de onde o README os carrega. Se a Action falhar, a `output` continua com a arte do dia anterior.
 
 ## Arquivos
 
 | Arquivo | Para que serve |
 |---|---|
-| `content.json` | todo o texto, os contatos e a lista de projetos |
+| `content.json` | todo o texto, os contatos, os projetos e a stack (cada item com `name` e `icon`) |
 | `build.py` | gera os SVG (`assets`) e o `README.md` (`readme`) |
 | `snapshot.py` | busca no GitHub os dados do dia (contribuições e pushes) |
 | `svgkit.py` | kit de SVG: mede fontes e desenha o texto em contornos |
+| `icons/` | os 15 SVG originais do simple-icons (CC0), `LICENSE.md` e `icons.json` (cor da marca de cada ícone) |
 | `requirements.in`, `requirements.txt` | dependências (`fonttools`, `pytest`), a segunda com hashes |
 | `fonts/` | fontes usadas na arte, com as licenças em `fonts/licenses/` |
 | `../tests/` | testes e dados fixos (`fixtures/snapshot.json`) |
+
+## O que é gerado (58 arquivos, todos na raiz de `--out`)
+
+- `hero-{desktop,mobile}-{dark,light}.svg` (4): a tela e-ink com nome, indicadores e o gráfico de 26 semanas.
+- `proj-<slug>-{desktop,mobile}-{dark,light}.svg` (24): uma "página" por projeto, com ícone em pixels,
+  título, data do último push, descrição e stack.
+- `stack-<icone>-{light,dark}.svg` (30): os 15 ícones da stack na cor da marca, ajustada para ter
+  contraste de pelo menos 3,5:1 contra o fundo do `<kbd>` do GitHub (TypeScript e JavaScript mantêm a
+  cor da marca com as letras sobre um quadrado).
+
+Os números vêm do snapshot: projetos públicos = quantidade de `repos` (repositórios públicos que não são fork
+e já receberam push); push mais recente = o
+repositório com `pushed_at` mais novo, **sem contar o próprio repositório do perfil** (o publish diário
+empurra para ele), desempate por nome. A data de cada projeto vem do `repo` dele.
 
 ## Gerar localmente
 
@@ -50,8 +65,8 @@ uv run --with-requirements tools/requirements.txt pytest -q
 2. Rode `uv run tools/build.py readme` e versione o `README.md` junto.
 
 O teste `test_readme_is_up_to_date` e o passo `readme --check` do workflow falham se o
-`README.md` não corresponder ao JSON. Um projeto novo também precisa de um nó no desenho do
-hero (`HERO` em `build.py`); o gerador recusa uma lista que não bata com os nós.
+`README.md` não corresponder ao JSON. Um projeto novo também precisa de um ícone de pixels
+(`PIXEL_ICONS` em `build.py`); o gerador recusa uma lista de projetos que não bata com eles.
 Todo projeto de `content.json` precisa estar entre os repositórios públicos do `login`; senão o
 gerador para com erro e não escreve nada.
 
@@ -65,15 +80,17 @@ gerador para com erro e não escreve nada.
   publica na branch `output` com git puro, num repositório novo de um commit só, com
   `push --force`.
 
-Antes de publicar, o job confere só com shell que o artefato tem exatamente 32 arquivos
+Antes de publicar, o job confere só com shell que o artefato tem exatamente 58 arquivos
 `.svg` comuns, na raiz, com nome `[a-z0-9][a-z0-9-]*.svg` (pasta `.git`, link simbólico,
 subpasta ou outro tipo de arquivo derrubam o job).
 
 Os limites do gerador: cada SVG com até 60.000 bytes e XML bem-formado. Interrompem a execução,
 antes de publicar e sem escrever nada: snapshot inválido (chave ausente ou com tipo errado,
-`weeks_26` que não tenha exatamente 26 semanas, `pushed_at` fora de AAAA-MM-DD), chave ausente
-no `content.json`, `desc_short` que não cabe em 2 linhas no celular, título e tipo que encostam
-na stack na faixa do desktop, e colisão de rótulo ou fio no hero. O `snapshot.py` também para
+`weeks_26` que não tenha exatamente 26 semanas, `pushed_at` fora de AAAA-MM-DD, nenhum repositório
+além do próprio perfil), chave ausente no `content.json`, ícone de stack ausente ou fora do formato
+esperado, texto que não cabe (descrição do desktop, `desc_short` em 2 linhas no celular, linha de
+stack, nome no celular abaixo de 28 px), título que encosta na data e rótulo que encosta no valor de
+um indicador. Nada é truncado em silêncio. O `snapshot.py` também para
 (sem imprimir o corpo nem o token) se a API do GitHub responder em formato inesperado.
 
 Agendamento: o GitHub pode desativar workflows agendados de repositório público após 60 dias
@@ -91,14 +108,28 @@ andar, reative o workflow em Actions.
    `uv pip compile --generate-hashes --python-version 3.13 tools/requirements.in -o tools/requirements.txt`;
 3. ajuste o `fonttools==` do cabeçalho de `build.py` (o `uv run` lê dali). O teste
    `test_fonttools_pin_is_the_same_everywhere` falha se os três não baterem;
-4. rode os testes e confira que `build.py assets` com a fixture gera os mesmos 32 arquivos (ou que
+4. rode os testes e confira que `build.py assets` com a fixture gera os mesmos 58 arquivos (ou que
    a diferença é esperada).
 
 As Actions são fixadas por SHA; o Dependabot propõe as atualizações.
 
 ## Fontes e licenças
 
-Bricolage Grotesque (variável) e IBM Plex Mono (Regular e Medium), ambas sob a SIL Open Font
-License 1.1; os textos estão em `fonts/licenses/`. As instâncias de peso da Bricolage são
+Literata (variável: 600 em pé e 400 itálico) e Departure Mono (`.otf`, CFF), ambas sob a SIL Open
+Font License 1.1; os textos estão em `fonts/licenses/`. As instâncias de peso da Literata são
 calculadas na primeira execução e guardadas em `fonts/.cache/` (ignorado pelo git); o nome do
 arquivo no cache inclui um hash do TTF de origem, então trocar a fonte invalida o cache.
+
+## Ícones da stack
+
+Os SVG de `icons/` são os originais do [simple-icons](https://github.com/simple-icons/simple-icons)
+(CC0 1.0, versão em `icons/icons.json`, campo `source`), sem alteração. Para atualizar:
+
+1. baixe os SVG da versão fixada (de preferência com mais de duas semanas) para `tools/icons/`,
+   trocando os arquivos e o `LICENSE.md`;
+2. ajuste em `icons/icons.json` o campo `source` e, se a marca mudou de cor, o `hex` de cada ícone
+   (`letters` é a cor das letras vazadas, só TypeScript e JavaScript);
+3. para um ícone novo, acrescente o SVG e a entrada no `icons.json` e use o nome dele (`icon`) em
+   `content.json`;
+4. rode `uv run tools/build.py readme` e os testes. O gerador exige `viewBox="0 0 24 24"`, filhos
+   exatamente `<title>` e `<path>` e um `d` só com comandos e números de caminho.

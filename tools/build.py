@@ -3,7 +3,7 @@
 # requires-python = ">=3.11"
 # dependencies = ["fonttools==4.69.1"]
 # ///
-"""Profile README generator: the 32 SVG art files and README.md.
+"""Profile README generator: the 58 SVG art files and README.md.
 
     tools/build.py assets --snapshot FILE --out DIR   write the SVG files (flat) into DIR
     tools/build.py readme [--check]                   write README.md (--check only compares)
@@ -32,11 +32,19 @@ import svgkit as K  # noqa: E402
 CONTENT_PATH = HERE / "content.json"
 README_PATH = ROOT / "README.md"
 
-PALETTE = {
-    "dark": {"bg": "#0d1117", "ink": "#f0f6fc", "body": "#d1d7e0", "muted": "#9198a1", "strand": "#d8d2c4", "accent": "#f2a33a"},
-    "light": {"bg": "#ffffff", "ink": "#1f2328", "body": "#3b424b", "muted": "#59636e", "strand": "#3d444d", "accent": "#c2500a"},
+ICONS_DIR = HERE / "icons"
+
+# the e-ink screen: paper and ink are the same in both themes; the body and the page colours follow the theme
+PAPER, INK = "#e8e4d9", "#1a1a18"
+THEMES = {
+    "dark": {"body": "#1c1e22", "edge": "#3d444d", "page_ink": "#e8e4d9", "page_muted": "#a8a497", "page_bg": "#0d1117", "dots": "#59636e"},
+    "light": {"body": "#26282c", "edge": "#101113", "page_ink": "#1a1a18", "page_muted": "#5c5a52", "page_bg": "#ffffff", "dots": "#101113"},
 }
-ACTIVE_DAYS = 14
+LIT6, LIT4I, DEP = "literata-600", "literata-400i", "departure"
+CRISP = 'shape-rendering="crispEdges"'
+MIN_NAME_SIZE = 28  # the mobile hero name never shrinks below this
+CHIP_BG = {"light": "f6f8fa", "dark": "151b23"}  # GitHub kbd backgrounds
+CHIP_CONTRAST = 3.5
 
 
 class BuildError(Exception):
@@ -61,6 +69,8 @@ def load_snapshot(path: Path) -> dict:
 
 ISO_DATE = re.compile(r"\d{4}-\d{2}-\d{2}")
 SLUG = re.compile(r"[a-z0-9][a-z0-9-]*")
+HEX6 = re.compile(r"[0-9a-fA-F]{6}")
+SVG_PATH_D = re.compile(r"[MmLlHhVvCcSsQqTtAaZz0-9.,\- ]+")
 WEEKS = 26
 
 
@@ -103,26 +113,40 @@ def validate_snapshot(snap, content: dict) -> None:
     if not isinstance(repos, dict):
         raise BuildError("snapshot: repos deve ser um objeto")
     for p in content["projects"]:
-        r = repos.get(p["repo"])
-        if r is None:
+        if p["repo"] not in repos:
             raise BuildError(f'projeto {p["repo"]} não está entre os repositórios públicos de {content["login"]}')
+    # every repository counts (public total, most recent push), so every entry must be well formed
+    for name, r in repos.items():
         if not isinstance(r, dict) or "pushed_at" not in r:
-            raise BuildError(f'snapshot: repos[{p["repo"]!r}] deve ser um objeto com pushed_at')
-        _iso_date(r["pushed_at"], f'repos[{p["repo"]!r}].pushed_at')
+            raise BuildError(f"snapshot: repos[{name!r}] deve ser um objeto com pushed_at")
+        _iso_date(r["pushed_at"], f"repos[{name!r}].pushed_at")
+
+
+def derive_status(repos: dict, login: str) -> tuple[int, dict]:
+    """(number of public repositories, {"repo", "date"} of the most recent push).
+
+    The profile repository itself is left out of the "most recent" pick: the daily publish pushes to it.
+    Ties on the date are broken by repository name, ascending. No other repository is an error.
+    """
+    others = sorted((name, r["pushed_at"][:10]) for name, r in repos.items() if name.lower() != login.lower())
+    if not others:
+        raise BuildError(f"nenhum repositório público além de {login} para mostrar o push mais recente")
+    name, date = max(others, key=lambda nd: nd[1])  # max keeps the first of equal dates: the smallest name
+    return len(repos), {"repo": name, "date": date}
 
 
 _STR, _LIST_STR = "str", "list[str]"
 CONTENT_SCHEMA = {
-    "name": _STR, "tagline": _STR, "tagline_parts": _LIST_STR, "lede": _STR, "about": _LIST_STR,
+    "name": _STR, "lede": _STR, "about": _LIST_STR,
     "also_private": _LIST_STR, "login": _STR, "assets_base": _STR, "footer": _STR,
     "contacts": [{"label": _STR, "url": _STR}],
-    "projects": [{"slug": _STR, "url": _STR, "title": _STR, "kind": _STR, "desc": _STR, "desc_short": _STR,
+    "projects": [{"slug": _STR, "url": _STR, "title": _STR, "desc": _STR, "desc_short": _STR,
                   "stack": _LIST_STR, "alt": _STR, "repo": _STR}],
     "studies": [{"title": _STR, "url": _STR, "note": _STR}],
-    "stack": [{"group": _STR, "items": _LIST_STR}],
-    "labels": {k: _STR for k in ("updated", "about", "projects", "stack", "activity_heading", "also_private",
-                                 "studies", "hub", "active_line", "push", "contrib_line")},
-    "alt": {"hero": _STR, "activity": _STR},
+    "stack": [{"group": _STR, "items": [{"name": _STR, "icon": _STR}]}],
+    "labels": {k: _STR for k in ("updated", "about", "projects", "stack", "also_private", "studies", "hub",
+                                 "contrib_line", "public_repos", "last_push", "most_recent")},
+    "alt": {"hero": _STR},
     "english": {"summary": _STR, "heading": _STR, "lede": _STR, "about": _LIST_STR, "closing": _STR},
 }
 
@@ -151,8 +175,16 @@ def _check_shape(value, schema, path: str) -> None:
 def validate_content(content) -> None:
     """Check that every key the generator reads exists in content.json, with the right type."""
     _check_shape(content, CONTENT_SCHEMA, "")
-    if len(content["tagline_parts"]) != 3:
-        raise BuildError("content.json: tagline_parts deve ter exatamente 3 itens")
+    # same rule as the file-name check of the publish job; also keeps the README URLs clean
+    for g in content["stack"]:
+        for item in g["items"]:
+            if not SLUG.fullmatch(item["icon"]):
+                raise BuildError(f'content.json: ícone {item["icon"]!r} de {item["name"]} inválido (use [a-z0-9][a-z0-9-]*)')
+
+
+def stack_icon_slugs(content: dict) -> list[str]:
+    """Icon slugs used by the stack chips, without repeats, sorted."""
+    return sorted({i["icon"] for g in content["stack"] for i in g["items"]})
 
 
 class Ctx:
@@ -162,366 +194,447 @@ class Ctx:
         self.snap, self.copy = snap, content
         self.lab = content["labels"]
         self.projects = content["projects"]
-        today = snap["today"]
-        self.active = {p["repo"]: self.days_ago(snap["repos"][p["repo"]]["pushed_at"], today) <= ACTIVE_DAYS
-                       for p in self.projects}
-        self.n_active = sum(self.active.values())
-        self.updated = f'{self.lab["updated"]} {K.fmt_date_pt(today)}'
+        self.public_repos, self.last_push = derive_status(snap["repos"], content["login"])
         self.files: dict[str, bytes] = {}
-
-    @staticmethod
-    def days_ago(iso: str, today: str) -> int:
-        days = (datetime.date.fromisoformat(today) - datetime.date.fromisoformat(iso[:10])).days
-        # a push dated after "today" (runner clock slightly behind) counts as today, never as negative days
-        return max(0, days)
 
     def emit(self, name: str, doc) -> None:
         self.files[name] = doc.to_bytes(name)
 
+    def emit_raw(self, name: str, raw: bytes) -> None:
+        if len(raw) > K.MAX_SVG_BYTES:
+            raise BuildError(f"{name}: {len(raw)} bytes passa do limite de {K.MAX_SVG_BYTES}")
+        self.files[name] = raw
+
+
+# the six project pages: 16x16 pixel icons. '#' ink, '+' dotted (50% dither), '.' empty
+PIXEL_ICONS = {
+    "kindle-monitor": [
+        "..############..",
+        "..#..........#..",
+        "..#.########.#..",
+        "..#..........#..",
+        "..#.######...#..",
+        "..#..........#..",
+        "..#.#######..#..",
+        "..#..........#..",
+        "..#..........#..",
+        "..#....##....#..",
+        "..#....##....#..",
+        "..#..#.##.#..#..",
+        "..#..#.##.#..#..",
+        "..#..#.##.#..#..",
+        "..############..",
+        "..############..",
+    ],
+    "sinapses": [
+        "................",
+        ".####...........",
+        ".#######........",
+        ".####..#........",
+        ".####..#........",
+        ".......#........",
+        "......++++......",
+        "......++++###...",
+        "......++++..#...",
+        "......++++..#...",
+        "............#...",
+        "...........####.",
+        "...........####.",
+        "...........####.",
+        "...........####.",
+        "................",
+    ],
+    "tailnet-dns-failover": [
+        ".####......####.",
+        ".####......####.",
+        "..##........++..",
+        "..##........++..",
+        "..##........++..",
+        "..##........++..",
+        "..##........++..",
+        "..##........++..",
+        "..######++++++..",
+        "..######++++++..",
+        ".......##.......",
+        ".......##.......",
+        ".......##.......",
+        ".......##.......",
+        ".......##.......",
+        ".......##.......",
+    ],
+    "galaxy-s10": [
+        ".#######........",
+        ".#.....#........",
+        ".#.+++.#...#....",
+        ".#.+++.#....#...",
+        ".#.+++.#.....#..",
+        ".#.+++.#......#.",
+        ".#.+++.#.#....#.",
+        ".#.+++.#..#...#.",
+        ".#.+++.#..#...#.",
+        ".#.+++.#.#....#.",
+        ".#.+++.#......#.",
+        ".#.+++.#.....#..",
+        ".#.+++.#....#...",
+        ".#.....#...#....",
+        ".#..#..#........",
+        ".#######........",
+    ],
+    "nomad": [
+        "................",
+        "................",
+        "..############..",
+        "..#..........#..",
+        "..#.++++++++.#..",
+        "..#.++++++++.#..",
+        "..#.++++++++.#..",
+        "..#.++++++++.#..",
+        "..#.++++++++.#..",
+        "..#.++++++++.#..",
+        "..#..........#..",
+        "..############..",
+        "################",
+        ".##############.",
+        "................",
+        "................",
+    ],
+    "dot-github": [
+        "................",
+        "................",
+        "................",
+        "................",
+        "................",
+        "................",
+        "####..++++..####",
+        "#..#..++++..####",
+        "#..###++++######",
+        "#..#..++++..####",
+        "####..++++..####",
+        "................",
+        "................",
+        "................",
+        "................",
+        "................",
+    ],
+}
+for _k, _v in PIXEL_ICONS.items():
+    assert len(_v) == 16 and all(len(r) == 16 for r in _v), _k
+
 
 def check_projects(snap: dict, content: dict) -> None:
-    repos = snap["repos"]
     for p in content["projects"]:
-        if p["repo"] not in repos:
-            raise BuildError(f'projeto {p["repo"]} não está entre os repositórios públicos de {content["login"]}')
         # same rule as the file-name check of the publish job in the workflow
         if not SLUG.fullmatch(p["slug"]):
             raise BuildError(f'projeto {p["repo"]}: slug {p["slug"]!r} inválido (use [a-z0-9][a-z0-9-]*)')
-    nodes = set(HERO["desktop"]["nodes"])
-    if {p["repo"] for p in content["projects"]} != nodes:
-        raise BuildError("os projetos de content.json diferem dos nós do desenho do hero: " + ", ".join(sorted(nodes)))
+    drawn = set(PIXEL_ICONS)
+    if {p["slug"] for p in content["projects"]} != drawn or len(content["projects"]) != len(drawn):
+        raise BuildError("os projetos de content.json diferem dos ícones do desenho: " + ", ".join(sorted(drawn)))
 
 
 def f(x):
     return K.num(x)
 
 
+# ------------------------------------------------------------------ stack icons (simple-icons, CC0)
+
+
+def load_icon_meta(icons_dir: Path = ICONS_DIR) -> dict:
+    """icons.json: icon slug -> {"hex": brand colour, "letters": colour of knocked-out letters or None}."""
+    path = icons_dir / "icons.json"
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, ValueError) as e:
+        raise BuildError(f"não consegui ler {path}: {e}") from e
+    icons = data.get("icons") if isinstance(data, dict) else None
+    if not isinstance(icons, dict) or not isinstance(data.get("source"), str):
+        raise BuildError(f"{path}: precisa ter 'source' (texto) e 'icons' (objeto)")
+    for slug, m in icons.items():
+        if not isinstance(m, dict) or not isinstance(m.get("hex"), str) or not HEX6.fullmatch(m["hex"]):
+            raise BuildError(f"{path}: icons[{slug!r}].hex deve ter 6 dígitos hexadecimais")
+        if "letters" not in m:
+            raise BuildError(f"{path}: icons[{slug!r}] precisa da chave letters (null ou 6 dígitos hexadecimais)")
+        letters = m["letters"]
+        if letters is not None and not (isinstance(letters, str) and HEX6.fullmatch(letters)):
+            raise BuildError(f"{path}: icons[{slug!r}].letters deve ser null ou 6 dígitos hexadecimais")
+    return icons
+
+
+def read_icon_path(slug: str, icons_dir: Path = ICONS_DIR) -> str:
+    """The ``d`` of a simple-icons SVG, after checking that the file has exactly the expected shape."""
+    import xml.etree.ElementTree as ET
+    ns = "{http://www.w3.org/2000/svg}"
+    path = icons_dir / f"{slug}.svg"
+    try:
+        root = ET.fromstring(path.read_text(encoding="utf-8"))
+    except (OSError, ET.ParseError) as e:
+        raise BuildError(f"ícone {slug}: não consegui ler {path.name}: {e}") from e
+    if root.tag != ns + "svg":
+        raise BuildError(f"ícone {slug}: a raiz deve ser <svg>")
+    if root.get("viewBox") != "0 0 24 24":
+        raise BuildError(f"ícone {slug}: viewBox deve ser '0 0 24 24', veio {root.get('viewBox')!r}")
+    if [k.tag for k in root] != [ns + "title", ns + "path"]:
+        raise BuildError(f"ícone {slug}: o <svg> deve ter exatamente <title> e <path>")
+    d = root.find(ns + "path").get("d")
+    if d is None or not SVG_PATH_D.fullmatch(d):
+        raise BuildError(f"ícone {slug}: o atributo d do <path> tem caracteres inesperados")
+    return d
+
+
+def _rgb(h: str) -> list[float]:
+    return [int(h[i:i + 2], 16) / 255 for i in (0, 2, 4)]
+
+
+def rel_luminance(h: str) -> float:
+    c = [x / 12.92 if x <= 0.04045 else ((x + 0.055) / 1.055) ** 2.4 for x in _rgb(h)]
+    return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2]
+
+
+def contrast_ratio(a: str, b: str) -> float:
+    la, lb = sorted((rel_luminance(a), rel_luminance(b)), reverse=True)
+    return (la + 0.05) / (lb + 0.05)
+
+
+def _mix(h: str, target: str, t: float) -> str:
+    return "".join(f"{round((x + (y - x) * t) * 255):02x}" for x, y in zip(_rgb(h), _rgb(target)))
+
+
+def icon_color(hexcolor: str, theme: str) -> str:
+    """Brand colour nudged toward black (light) or white (dark) until it reaches 3.5:1 on the GitHub chip."""
+    h = hexcolor.lower()
+    if theme == "dark" and rel_luminance(h) < 0.03:  # black marks turn near-white on dark, as their own dark logos do
+        return "e6edf3"
+    target = "000000" if theme == "light" else "ffffff"
+    t = 0.0
+    while contrast_ratio(_mix(h, target, t), CHIP_BG[theme]) < CHIP_CONTRAST and t < 1:
+        t += 0.02
+    return _mix(h, target, t)
+
+
+def stack_icon_svg(slug: str, meta: dict, d: str, theme: str) -> bytes:
+    letters = meta["letters"]
+    if letters:  # a square logo: fill behind the letters so it reads as the real mark on any chip
+        fill = meta["hex"].lower()
+        back = f'<rect x="1" y="1" width="22" height="22" fill="#{letters}"/>'
+    else:
+        fill, back = icon_color(meta["hex"], theme), ""
+    return (f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true">'
+            f'{back}<path fill="#{fill}" d="{d}"/></svg>\n').encode("utf-8")
+
+
+def stack_icons(ctx, icons_dir: Path = ICONS_DIR) -> None:
+    meta = load_icon_meta(icons_dir)
+    for slug in stack_icon_slugs(ctx.copy):
+        if not SLUG.fullmatch(slug):
+            raise BuildError(f"ícone {slug!r}: nome inválido (use [a-z0-9][a-z0-9-]*)")
+        if slug not in meta:
+            raise BuildError(f"ícone {slug}: falta em {icons_dir.name}/icons.json")
+        d = read_icon_path(slug, icons_dir)
+        for theme in ("light", "dark"):
+            ctx.emit_raw(f"stack-{slug}-{theme}.svg", stack_icon_svg(slug, meta[slug], d, theme))
+
+
+# ------------------------------------------------------------------ text helpers
+
+
+def dep(d, x, y, s, size, fill, right=None, tracking=0.0):
+    """Departure text at integer x/y; if right is given the text ends at that x."""
+    fnt = K.font(DEP)
+    if right is not None:
+        x = right - fnt.measure(s, size, tracking) + tracking
+    return d.text(round(x), y, s, fnt, size, fill, tracking=tracking)
+
+
+def dither(pid, color):
+    return (f'<pattern id="{pid}50" width="2" height="2" patternUnits="userSpaceOnUse">'
+            f'<rect x="0" y="0" width="1" height="1" fill="{color}"/><rect x="1" y="1" width="1" height="1" fill="{color}"/></pattern>')
+
+
+def month_marks(weeks):
+    """Index and name of the first week starting on day <= 7 of each month."""
+    marks, seen = [], None
+    for i, w in enumerate(weeks):
+        y, m, dd = int(w["start"][:4]), int(w["start"][5:7]), int(w["start"][8:10])
+        if dd <= 7 and (y, m) != seen and i > 0:
+            marks.append((i, K.MONTHS_PT[m - 1]))
+            seen = (y, m)
+    return marks
+
+
 # ------------------------------------------------------------------ hero
-
-HERO = {
-    "desktop": dict(
-        W=846, H=300, name_size=52, name_track=-1, name_y=132, tag_size=12, tag_track=1.6, tag_y=164,
-        text_max=372, state_y=208, state_size=11.5, hub=(636, 150), lab=11, gx=(400, 846), grid=22,
-        nodes={"sinapses": (640, 36, "up"), "kindle-monitor": (498, 72, "up"), "galaxy-s10": (776, 86, "up"),
-               ".github": (800, 196, "down"), "nomad": (690, 258, "down"), "tailnet-dns-failover": (512, 228, "down")},
-        k=(18, 26), hub_label=("end", -26, 4), x_lo=404, x_hi=846),
-    "mobile": dict(
-        W=308, H=380, name_size=36, name_track=-0.6, name_y=40, tag_size=10.5, tag_track=1.1, tag_y=62,
-        text_max=308, state_y=364, state_size=10, hub=(154, 212), lab=10, gx=(0, 308), grid=22,
-        nodes={"sinapses": (154, 106, "up"), "kindle-monitor": (54, 152, "up"), "galaxy-s10": (256, 152, "up"),
-               ".github": (280, 236, "down"), "nomad": (236, 300, "down"), "tailnet-dns-failover": (72, 290, "down")},
-        k=(10, 16), hub_label=("middle", 0, 38), x_lo=0, x_hi=308),
-}
-EDGES = [("hub", "sinapses"), ("hub", "kindle-monitor"), ("hub", "galaxy-s10"), ("hub", ".github"),
-         ("hub", "nomad"), ("hub", "tailnet-dns-failover"),
-         ("nomad", "tailnet-dns-failover"), ("kindle-monitor", "galaxy-s10")]
-# per-edge duration (s) and negative delay; odd edges reversed
-DURS = [3.4, 4.0, 3.1, 4.4, 3.7, 2.9, 4.2, 3.3]
-DELAYS = [-0.4, -2.1, -1.2, -3.3, -0.9, -2.6, -1.7, -3.0]
-# (device, edge index) -> -1 flips the bow of that edge; chosen after looking at renders
-EDGE_SIGN = {("desktop", 6): -1, ("desktop", 2): -1}
-
-
-def bez(p0, c1, c2, p3, t):
-    u = 1 - t
-    return (u**3 * p0[0] + 3 * u * u * t * c1[0] + 3 * u * t * t * c2[0] + t**3 * p3[0],
-            u**3 * p0[1] + 3 * u * u * t * c1[1] + 3 * u * t * t * c2[1] + t**3 * p3[1])
 
 
 def hero(ctx, device, theme):
-    c = PALETTE[theme]
-    g = HERO[device]
+    """Wide e-ink display: thin bezel, no device chin, panel laid out in two bands."""
+    c = THEMES[theme]
+    snap, copy, L = ctx.snap, ctx.copy, ctx.lab
     mob = device == "mobile"
-    W, H = g["W"], g["H"]
-    d = K.Doc(W, H, ctx.copy["alt"]["hero"])
-    bold = K.font("bricolage-800")
-    mono5 = K.font("plexmono-500")
-    mono4 = K.font("plexmono-400")
-    # ---- text block
-    size = g["name_size"]
-    while bold.measure(ctx.copy["name"], size, g["name_track"]) > g["text_max"]:
-        size -= 1
-    d.add(d.text(0, g["name_y"], ctx.copy["name"], bold, size, c["ink"], tracking=g["name_track"]))
-    tag = ctx.copy["tagline"].upper()
-    parts = [p.upper() for p in ctx.copy["tagline_parts"]]
-    ts, tt = g["tag_size"], g["tag_track"]
-    tx = 0 if mob else 2
-    if mono5.measure(tag, ts, tt) + tx <= (308 if mob else g["text_max"]):
-        d.add(d.text(tx, g["tag_y"], tag, mono5, ts, c["muted"], tracking=tt))
+    if mob:
+        W, bez, chin, sh = 308, 10, 22, 356
     else:
-        d.add(d.text(tx, g["tag_y"], " · ".join(parts[:2]) + " ·", mono5, ts, c["muted"], tracking=tt))
-        d.add(d.text(tx, g["tag_y"] + 16, parts[2], mono5, ts, c["muted"], tracking=tt))
-    ss = g["state_size"]
-    line = ctx.lab["active_line"].replace("{n}", str(ctx.n_active))
-    if mono4.measure(line, ss) + (14 if mob else 18) > (290 if mob else g["text_max"]):
-        line = f"{ctx.n_active} de {len(ctx.projects)} ativos em {ACTIVE_DAYS} dias"
-    sy = g["state_y"]
-    d.add(f'<circle class="breathe-dot" cx="3.5" cy="{f(sy - 4)}" r="3.5" fill="{c["accent"]}"/>' if not mob else
-          f'<circle class="breathe-dot" cx="3.5" cy="{f(sy - 3.5)}" r="3.5" fill="{c["accent"]}"/>')
-    d.add(d.text(14 if mob else 18, sy, line, mono4, ss, c["muted"]))
-    if not mob:
-        d.add(d.text(18, 228, ctx.updated, mono4, 11, c["muted"]))
-
-    # ---- graph
-    hx, hy = g["hub"]
-    gx0, gx1 = g["gx"]
-    gs = g["grid"]
-    d.defs(f'<pattern id="dots" width="{gs}" height="{gs}" patternUnits="userSpaceOnUse"><circle cx="{gs / 2}" cy="{gs / 2}" r="0.9" fill="{c["strand"]}"/></pattern>')
-    rx = (gx1 - gx0) / 2
-    d.defs(f'<radialGradient id="fade" gradientUnits="userSpaceOnUse" cx="{f(hx)}" cy="{f(hy)}" r="{f(max(rx, H / 2) * 1.0)}">'
-           '<stop offset="0" stop-color="#fff"/><stop offset=".55" stop-color="#fff" stop-opacity=".85"/><stop offset="1" stop-color="#000"/></radialGradient>')
-    d.defs(f'<mask id="gmask"><rect x="{gx0}" y="0" width="{gx1 - gx0}" height="{H}" fill="url(#fade)"/></mask>')
-    y0 = 84 if mob else 0
-    y1 = 340 if mob else H
-    d.add(f'<g mask="url(#gmask)" opacity=".16"><rect x="{gx0}" y="{y0}" width="{gx1 - gx0}" height="{y1 - y0}" fill="url(#dots)"/></g>')
-
-    pos = {"hub": (hx, hy, 14)}
-    for repo, (x, y, side) in g["nodes"].items():
-        pos[repo] = (x, y, 9)
-    labels = []  # (repo, x0, x1, ytop, ybot)
-    lab = g["lab"]
-    for repo, (x, y, side) in g["nodes"].items():
-        w = mono5.measure(repo, lab)
-        base = y - 9 - 9 if side == "up" else y + 9 + 9 + mono5.cap_height(lab)
-        labels.append((repo, x - w / 2, x + w / 2, base - mono5.cap_height(lab) - 1, base + 2.5, base, side))
-        if x - w / 2 < g["x_lo"] or x + w / 2 > g["x_hi"]:
-            raise BuildError(f"hero-{device}: o rótulo {repo} sai da faixa do desenho")
-    anc, dx, dy = g["hub_label"]
-    hw = mono5.measure(ctx.lab["hub"], lab)
-    hlx = hx + dx
-    hly = hy + dy
-    hx0 = hlx - hw if anc == "end" else (hlx - hw / 2 if anc == "middle" else hlx)
-    labels.append(("hub", hx0, hx0 + hw, hly - mono5.cap_height(lab) - 1, hly + 2.5, hly, anc))
-
-    for i, a in enumerate(labels):
-        for b in labels[i + 1:]:
-            if a[1] - 2 <= b[2] and b[1] - 2 <= a[2] and a[3] - 2 <= b[4] and b[3] - 2 <= a[4]:
-                raise BuildError(f"hero-{device}: o rótulo {a[0]} colide com o rótulo {b[0]}")
-
-    paths = []
-    kmin, kmax = g["k"]
-    for i, (a, b) in enumerate(EDGES):
-        ax, ay, ar = pos[a]
-        bx, by, br = pos[b]
-        L = math.hypot(bx - ax, by - ay)
-        ux, uy = (bx - ax) / L, (by - ay) / L
-        p0 = (ax + ux * ar, ay + uy * ar)
-        p3 = (bx - ux * br, by - uy * br)
-        nx, ny = -uy, ux
-        k = (kmin + (kmax - kmin) * ((i * 37) % 9) / 8) * (1 if i % 2 == 0 else -1)
-        k *= EDGE_SIGN.get((device, i), 1)
-        c1 = (p0[0] + (p3[0] - p0[0]) * .35 + nx * k, p0[1] + (p3[1] - p0[1]) * .35 + ny * k)
-        c2 = (p0[0] + (p3[0] - p0[0]) * .65 - nx * k, p0[1] + (p3[1] - p0[1]) * .65 - ny * k)
-        paths.append((a, b, p0, c1, c2, p3))
-        # collision check vs labels
-        for t in [j / 60 for j in range(61)]:
-            px, py = bez(p0, c1, c2, p3, t)
-            for (nm, lx0, lx1, lt, lb, _, _) in labels:
-                if lx0 - 2 <= px <= lx1 + 2 and lt - 2 <= py <= lb + 2:
-                    raise BuildError(f"hero-{device}: o fio {a}-{b} cruza o rótulo {nm} em ({px:.0f},{py:.0f})")
-
-    css = [".breathe-dot{animation:dotpulse 2.4s ease-in-out infinite}",
-           "@keyframes dotpulse{0%,100%{opacity:.45}50%{opacity:1}}",
-           ".breath{transform-box:fill-box;transform-origin:center;animation:breath 3.6s ease-out infinite}",
-           "@keyframes breath{0%{transform:scale(1);opacity:.5}100%{transform:scale(1.571);opacity:0}}",
-           ".pulse{stroke-dasharray:7 200;stroke-dashoffset:7;animation-name:travel;animation-timing-function:linear;animation-iteration-count:infinite}",
-           ".halo{stroke-dasharray:7 200;stroke-dashoffset:7;animation-name:travel;animation-timing-function:linear;animation-iteration-count:infinite}",
-           "@keyframes travel{from{stroke-dashoffset:7}to{stroke-dashoffset:-100}}"]
-    for line_css in css:
-        d.css(line_css)
+        W, bez, chin, sh = 846, 12, 28, 292
+    H = bez + sh + chin
+    sx, sy, sw = bez, bez, W - 2 * bez
+    m = 16 if mob else 28
+    right = sw - m
+    d = K.Doc(W, H, copy["alt"]["hero"])
+    d.css(".sweep{animation:sweep 28s steps(16,end) infinite}"
+          f"@keyframes sweep{{0%,95%{{transform:translateY(0)}}100%{{transform:translateY({sh + 46}px)}}}}")
     d.css(K.REDUCED_MOTION_CSS)
+    d.defs(f'<clipPath id="scr"><rect x="0" y="0" width="{sw}" height="{sh}" rx="2"/></clipPath>')
+    d.defs(dither("d", INK))
+    # body: a plain monitor frame, power LED on the lower bezel
+    d.add(f'<rect x="0.5" y="0.5" width="{W - 1}" height="{H - 1}" rx="{12 if mob else 14}" fill="{c["body"]}" stroke="{c["edge"]}"/>')
+    led_y = sy + sh + chin // 2
+    d.add(f'<rect x="{W - bez - 22}" y="{led_y - 1}" width="10" height="2" rx="1" fill="{c["dots"]}"/>')
+    d.add(f'<rect x="{sx}" y="{sy}" width="{sw}" height="{sh}" rx="2" fill="{PAPER}"/>')
+    g = [f'<g transform="translate({sx} {sy})" clip-path="url(#scr)">']
+    t = lambda *a, **k: g.append(dep(d, *a, **k))  # noqa: E731
+    f11 = K.font(DEP)
 
-    wires, pulses = [], []
-    for i, (a, b, p0, c1, c2, p3) in enumerate(paths):
-        dd = f"M{f(p0[0])} {f(p0[1])}C{f(c1[0])} {f(c1[1])} {f(c2[0])} {f(c2[1])} {f(p3[0])} {f(p3[1])}"
-        act = ctx.active[b] and (a == "hub" or ctx.active[a])
-        dash = "" if act else ' stroke-dasharray="2 5"'
-        wires.append(f'<path d="{dd}" fill="none" stroke="{c["strand"]}" stroke-width="1.25" stroke-opacity=".55" stroke-linecap="round"{dash}/>')
-        if act:
-            st = f'animation-duration:{DURS[i]}s;animation-delay:{DELAYS[i]}s' + (";animation-direction:reverse" if i % 2 else "")
-            pulses.append(f'<path class="halo" d="{dd}" pathLength="100" fill="none" stroke="{c["accent"]}" stroke-width="5" stroke-opacity=".18" stroke-linecap="round" style="{st}"/>')
-            pulses.append(f'<path class="pulse" d="{dd}" pathLength="100" fill="none" stroke="{c["accent"]}" stroke-width="2" stroke-linecap="round" style="{st}"/>')
-    for w in wires:
-        d.add(w)
-    for p in pulses:
-        d.add(p)
-    # hub
-    d.add(f'<circle class="breath" cx="{hx}" cy="{hy}" r="14" fill="none" stroke="{c["ink"]}" stroke-width="1.2"/>')
-    d.add(f'<circle cx="{hx}" cy="{hy}" r="14" fill="none" stroke="{c["ink"]}" stroke-width="1.5"/>')
-    d.add(f'<circle cx="{hx}" cy="{hy}" r="5" fill="{c["ink"]}"/>')
-    for repo, (x, y, side) in g["nodes"].items():
-        d.add(f'<circle cx="{x}" cy="{y}" r="9" fill="none" stroke="{c["strand"]}" stroke-width="1" stroke-opacity=".45"/>')
-        if ctx.active[repo]:
-            d.add(f'<circle cx="{x}" cy="{y}" r="5" fill="{c["accent"]}"/>')
-        else:
-            d.add(f'<circle cx="{x}" cy="{y}" r="4.5" fill="none" stroke="{c["strand"]}" stroke-width="1.25"/>')
-    for (nm, lx0, lx1, lt, lb, base, side) in labels:
-        if nm == "hub":
-            d.add(d.text(hlx, hly, ctx.lab["hub"], mono5, lab, c["muted"], anchor=anc))
-        else:
-            d.add(d.text((lx0 + lx1) / 2, base, nm, mono5, lab, c["ink"], anchor="middle"))
+    def leaders(lab, val, y, x_left, x_right):
+        label_end = x_left + f11.measure(lab, 11)
+        value_start = x_right - f11.measure(val, 11)
+        x0, x1 = round(label_end) + 6, round(value_start) - 6
+        if x0 > x1:
+            raise BuildError(f"hero-{device}: o rótulo {lab!r} e o valor {val!r} do indicador se sobrepõem")
+        t(x_left, y, lab, 11, INK)
+        t(0, y, val, 11, INK, right=x_right)
+        xs = range(x0 + (-x0) % 4, x1, 4)
+        g.append(f'<path d="{"".join(f"M{x} {y - 1}h1v1h-1z" for x in xs)}" fill="{INK}" {CRISP}/>')
+
+    def bars(x_left, base, bw, step, mh, mon_y, every=1):
+        weeks = snap["weeks_26"]
+        counts = [w["count"] for w in weeks]
+        out = []
+        for i, (cnt, h) in enumerate(zip(counts, K.sqrt_scale(counts, mh))):
+            x = round(x_left + i * step)
+            if cnt == 0:
+                out.append(f'<rect x="{x}" y="{base - 1}" width="{bw}" height="1" fill="{INK}"/>')
+                continue
+            hh = max(2, int(round(h / 2)) * 2)
+            fill = INK if i == len(weeks) - 1 else "url(#d50)"
+            out.append(f'<rect x="{x}" y="{base - hh}" width="{bw}" height="{hh}" fill="{fill}"/>')
+        g.append(f'<g {CRISP}>' + "".join(out) + "</g>")
+        span = round(x_left + (len(weeks) - 1) * step) + bw - x_left
+        g.append(f'<rect x="{x_left}" y="{base}" width="{span}" height="1" fill="{INK}" {CRISP}/>')
+        for k, (i, name) in enumerate(month_marks(weeks)):
+            if k % every:
+                continue
+            t(round(x_left + i * step), mon_y, name, 11, INK)
+
+    lp = ctx.last_push
+    inds = [(L["public_repos"], str(ctx.public_repos)), (L["last_push"], K.fmt_day_month_pt(lp["date"])),
+            (L["most_recent"], lp["repo"])]
+    big = K.font(LIT6)
+    total = K.fmt_int_pt(snap["contributions_year"])
+    if mob:
+        t(m, 24, L["hub"], 11, INK)
+        t(0, 24, f"{L['updated']} em {K.fmt_day_month_pt(snap['today'])}", 11, INK, right=right)
+        g.append(f'<rect x="{m}" y="34" width="{right - m}" height="1" fill="{INK}" {CRISP}/>')
+        size = 34
+        while big.measure(copy["name"], size) > right - m:
+            size -= 1
+            if size < MIN_NAME_SIZE:
+                raise BuildError(f"hero-mobile: o nome {copy['name']!r} exigiria menos de {MIN_NAME_SIZE} px para caber")
+        g.append(d.text(m, 80, copy["name"], big, size, INK))
+        g.append(f'<line x1="{m}" y1="100.5" x2="{right}" y2="100.5" stroke="{INK}" stroke-dasharray="1 3" {CRISP}/>')
+        for (lab, val), y in zip(inds, (128, 150, 172)):
+            leaders(lab, val, y, m, right)
+        g.append(f'<line x1="{m}" y1="192.5" x2="{right}" y2="192.5" stroke="{INK}" stroke-dasharray="1 3" {CRISP}/>')
+        t(m, 228, total, 22, INK)
+        t(m, 248, L["contrib_line"], 11, INK)
+        bars(m, 322, 7, 9.6, 56, 340, every=2)
+    else:
+        if m + big.measure(copy["name"], 52) + 12 > 500:
+            raise BuildError(f"hero-desktop: o nome {copy['name']!r} encosta na coluna dos indicadores")
+        t(m, 28, L["hub"], 11, INK)
+        t(0, 28, f"{L['updated']} em {K.fmt_date_pt(snap['today'])}", 11, INK, right=right)
+        g.append(f'<rect x="{m}" y="40" width="{right - m}" height="1" fill="{INK}" {CRISP}/>')
+        g.append(d.text(m, 106, copy["name"], big, 52, INK))
+        for (lab, val), y in zip(inds, (72, 92, 112)):
+            leaders(lab, val, y, 500, right)
+        g.append(f'<line x1="{m}" y1="136.5" x2="{right}" y2="136.5" stroke="{INK}" stroke-dasharray="1 3" {CRISP}/>')
+        t(m, 172, total, 22, INK)
+        f22 = f11.measure(total, 22)
+        t(round(m + f22) + 12, 172, L["contrib_line"], 11, INK)
+        bars(m, 256, 22, (right - m - 22) / 25, 66, 276)
+    g.append(f'<rect class="sweep" x="0" y="-46" width="{sw}" height="46" fill="{INK}" opacity="0.1"/>')
+    g.append(f'<rect x="0.5" y="0.5" width="{sw - 1}" height="{sh - 1}" rx="2" fill="none" stroke="{INK}" stroke-opacity="0.25"/>')
+    g.append("</g>")
+    d.add("\n".join(g))
     ctx.emit(f"hero-{device}-{theme}.svg", d)
 
 
-# ------------------------------------------------------------------ project strips
+# ------------------------------------------------------------------ project pages
 
 
-def strip(ctx, device, theme, idx, p):
-    c = PALETTE[theme]
+def icon_path(rows, cell, ch):
+    out = []
+    for y, r in enumerate(rows):
+        x = 0
+        while x < 16:
+            if r[x] == ch:
+                x0 = x
+                while x < 16 and r[x] == ch:
+                    x += 1
+                out.append(f"M{x0 * cell} {y * cell}h{(x - x0) * cell}v{cell}h-{(x - x0) * cell}z")
+            else:
+                x += 1
+    return "".join(out)
+
+
+def proj(ctx, device, theme, p):
+    c = THEMES[theme]
     mob = device == "mobile"
-    n = len(ctx.projects)
+    it = K.font(LIT4I)
+    df = K.font(DEP)
+    tf = K.font(LIT6)
+    W = 308 if mob else 846
+    cell, oy, tx = (2, 6, 44) if mob else (4, 22, 84)
+    box = W - tx  # text column: 264 on mobile, 762 on desktop
+    stack = ", ".join(p["stack"])
+    if df.measure(stack, 11) > box:
+        raise BuildError(f'projeto {p["repo"]}: a stack não cabe numa linha no {device}')
     if mob:
-        dfont = K.font("bricolage-400")
-        dlines = dfont.wrap(p["desc_short"], 13.5, 278)
-        if len(dlines) > 2 or any(dfont.measure(ln, 13.5) > 278 for ln in dlines):
+        lines = it.wrap(p["desc_short"], 13.5, box)
+        if len(lines) > 2 or any(it.measure(ln, 13.5) > box for ln in lines):
             raise BuildError(f'projeto {p["repo"]}: desc_short não cabe em 2 linhas no celular '
                              "(texto longo demais ou palavra mais larga que a caixa)")
-        foot_y = 50 + 18 * (len(dlines) - 1) + 26
-        W, H = 308, foot_y + 16
+        H = 54 + 18 * (len(lines) - 1) + 26 + 21
     else:
-        W, H = 846, 88
-    first, last = idx == 0, idx == n - 1
-    act = ctx.active[p["repo"]]
+        if it.measure(p["desc"], 15) > box:
+            raise BuildError(f'projeto {p["repo"]}: desc não cabe numa linha no desktop')
+        H = 104
+    ink, muted = c["page_ink"], c["page_muted"]
     d = K.Doc(W, H, p["alt"])
-    t6 = K.font("bricolage-600")
-    b4 = K.font("bricolage-400")
-    m5 = K.font("plexmono-500")
-    m4 = K.font("plexmono-400")
-    sx = 8.5 if mob else 12.5
-    ny = 22 if mob else 44
-    ya = ny if first else 0
-    yb = ny if last else H
-    spine = f"M{sx} {ya}V{yb}"
-    d.css(".sp{stroke-dasharray:14 200;stroke-dashoffset:14;animation:drop 7.2s linear infinite}"
-          "@keyframes drop{0%{stroke-dashoffset:14}16.66%{stroke-dashoffset:-100}100%{stroke-dashoffset:-100}}")
-    d.css(K.REDUCED_MOTION_CSS)
-    d.add(f'<path d="{spine}" fill="none" stroke="{c["strand"]}" stroke-width="1.25" stroke-opacity=".5"/>')
-    if not mob:
-        d.add(f'<path d="M{sx + 10} {ny}H40" fill="none" stroke="{c["strand"]}" stroke-width="1.25" stroke-opacity=".5"/>')
-    d.add(f'<path class="sp" d="{spine}" pathLength="100" fill="none" stroke="{c["accent"]}" stroke-width="2" stroke-linecap="round" style="animation-delay:{f(idx * 1.2)}s"/>')
-    d.add(f'<circle cx="{sx}" cy="{ny}" r="9" fill="none" stroke="{c["strand"]}" stroke-width="1" stroke-opacity=".45"/>')
-    if act:
-        d.add(f'<circle cx="{sx}" cy="{ny}" r="5" fill="{c["accent"]}"/>')
-    else:
-        d.add(f'<circle cx="{sx}" cy="{ny}" r="4.5" fill="none" stroke="{c["strand"]}" stroke-width="1.25"/>')
-    kind = p["kind"].upper()
-    stack = " · ".join(p["stack"]).upper()
-    date = K.fmt_day_month_pt(ctx.snap["repos"][p["repo"]]["pushed_at"])
-    if not mob:
-        d.add(d.text(52, 38, p["title"], t6, 21, c["ink"]))
-        tw = t6.measure(p["title"], 21)
-        sw = m5.measure(stack, 11, 1)
-        if 52 + tw + 12 + m5.measure(kind, 11, 1.2) + 16 > 846 - sw + 1:
-            raise BuildError(f'projeto {p["repo"]}: título e tipo encostam na stack na faixa do desktop')
-        d.add(d.text(52 + tw + 12, 37, kind, m5, 11, c["muted"], tracking=1.2))
-        desc = b4.fit(p["desc"], 14.5, 588)
-        d.add(d.text(52, 63, desc, b4, 14.5, c["body"]))
-        d.add(d.text(846 - sw + 1, 37, stack, m5, 11, c["muted"], tracking=1))
-        ptxt = f'{ctx.lab["push"]} · {date}'
-        pw = m4.measure(ptxt, 11)
-        d.add(d.text(846 - pw, 63, ptxt, m4, 11, c["muted"]))
-        if act:
-            d.add(f'<circle cx="{f(846 - pw - 9)}" cy="59.5" r="3" fill="{c["accent"]}"/>')
-    else:
-        d.add(d.text(28, 27, p["title"], t6, 17, c["ink"]))
-        tw = t6.measure(p["title"], 17)
-        kw = m5.measure(kind, 10, 1)
-        if 308 - kw - (28 + tw) >= 10:
-            d.add(d.text(308 - kw + 1, 26, kind, m5, 10, c["muted"], tracking=1))
-        for j, ln in enumerate(dlines):
-            d.add(d.text(28, 50 + 18 * j, ln, b4, 13.5, c["body"]))
-        dw = m4.measure(date, 10)
-        smax = 308 - 28 - dw - 12
-        trk = 1 if m5.measure(stack, 10, 1) <= smax else 0.5
-        st = m5.fit(stack, 10, smax, trk)
-        d.add(d.text(28, foot_y, st, m5, 10, c["muted"], tracking=trk))
-        d.add(d.text(308 - dw, foot_y, date, m4, 10, c["muted"]))
-    ctx.emit(f'proj-{p["slug"]}-{device}-{theme}.svg', d)
-
-
-# ------------------------------------------------------------------ activity
-
-
-def monotone(pts):
-    """Fritsch-Carlson monotone cubic through pts; returns SVG path d (never overshoots data)."""
-    n = len(pts)
-    xs, ys = [p[0] for p in pts], [p[1] for p in pts]
-    dx = [xs[i + 1] - xs[i] for i in range(n - 1)]
-    sl = [(ys[i + 1] - ys[i]) / dx[i] for i in range(n - 1)]
-    m = [sl[0]] + [0 if sl[i - 1] * sl[i] <= 0 else (sl[i - 1] + sl[i]) / 2 for i in range(1, n - 1)] + [sl[-1]]
-    for i in range(n - 1):
-        if sl[i] == 0:
-            m[i] = m[i + 1] = 0
-        else:
-            a, b = m[i] / sl[i], m[i + 1] / sl[i]
-            s = a * a + b * b
-            if s > 9:
-                t = 3 / math.sqrt(s)
-                m[i], m[i + 1] = t * a * sl[i], t * b * sl[i]
-    out = f"M{f(xs[0])} {f(ys[0])}"
-    for i in range(n - 1):
-        h = dx[i] / 3
-        out += f"C{f(xs[i] + h)} {f(ys[i] + m[i] * h)} {f(xs[i + 1] - h)} {f(ys[i + 1] - m[i + 1] * h)} {f(xs[i + 1])} {f(ys[i + 1])}"
-    return out
-
-
-def activity(ctx, device, theme):
-    c = PALETTE[theme]
-    mob = device == "mobile"
-    W, H = (308, 156) if mob else (846, 132)
-    d = K.Doc(W, H, ctx.copy["alt"]["activity"])
-    b8 = K.font("bricolage-800")
-    m5 = K.font("plexmono-500")
-    m4 = K.font("plexmono-400")
-    total = K.fmt_int_pt(ctx.snap["contributions_year"])
-    cl = ctx.lab["contrib_line"].upper()
-    weeks = ctx.snap["weeks_26"]
-    counts = [w["count"] for w in weeks]
+    d.defs(dither("p", ink))
+    rows = PIXEL_ICONS[p["slug"]]
+    d.add(f'<g transform="translate(0 {oy})" {CRISP}><path d="{icon_path(rows, cell, "#")}" fill="{ink}"/>'
+          f'<path d="{icon_path(rows, cell, "+")}" fill="url(#p50)"/></g>')
+    tsize = 18 if mob else 23
+    pushed = ctx.snap["repos"][p["repo"]]["pushed_at"]
+    num = K.fmt_day_month_pt(pushed) if mob else f"{ctx.lab['last_push']} {K.fmt_day_month_pt(pushed)}"
+    ty = 28 if mob else 38
+    d.add(d.text(tx, ty, p["title"], tf, tsize, ink))
+    d.add(dep(d, 0, ty, num, 11, muted, right=W))
+    x0 = tx + round(tf.measure(p["title"], tsize)) + 12
+    x1 = round(W - df.measure(num, 11)) - 12
+    if x0 > x1:
+        raise BuildError(f'projeto {p["repo"]}: o título encosta na data no {device}')
+    if x1 - x0 >= 30:  # a leader shorter than 30 px is left out
+        d.add(f'<line x1="{x0}" y1="{ty - 5.5}" x2="{x1}" y2="{ty - 5.5}" stroke="{ink}" stroke-dasharray="1 5" {CRISP}/>')
     if mob:
-        x0, x1, top, ymax, base_y, ty, my = 6, 302, 122, 56, 126.5, 22, 146
-        d.add(d.text(0, 22, total, b8, 24, c["ink"]))
-        d.add(d.text(0, 40, cl, m5, 10, c["muted"], tracking=1))
-        if m5.measure(cl, 10, 1) + m4.measure(ctx.updated, 10) + 12 <= 308:
-            d.add(d.text(308 - m4.measure(ctx.updated, 10), 40, ctx.updated, m4, 10, c["muted"]))
-        fs = 10
+        for i, ln in enumerate(lines):
+            d.add(d.text(tx, 54 + 18 * i, ln, it, 13.5, ink))
+        sy = 54 + 18 * (len(lines) - 1) + 26
+        d.add(dep(d, tx, sy, stack, 11, muted))
+        foot = sy + 20.5
     else:
-        x0, x1, top, ymax, base_y, ty, my = 16, 830, 100, 62, 104.5, 26, 124
-        d.add(d.text(0, 26, total, b8, 28, c["ink"]))
-        d.add(d.text(b8.measure(total, 28) + 10, 26, cl, m5, 11, c["muted"], tracking=1))
-        d.add(d.text(846 - m4.measure(ctx.updated, 11), 26, ctx.updated, m4, 11, c["muted"]))
-        fs = 11
-    ys = [top - v for v in K.sqrt_scale(counts, ymax)]
-    n = len(counts)
-    xs = [x0 + (x1 - x0) * i / (n - 1) for i in range(n)]
-    pts = list(zip(xs, ys))
-    curve = monotone(pts)
-    d.css(".br{transform-box:fill-box;transform-origin:center;animation:br 3.6s ease-out infinite}"
-          "@keyframes br{0%{transform:scale(1);opacity:.55}100%{transform:scale(2.2);opacity:0}}"
-          ".tr{stroke-dasharray:4 200;stroke-dashoffset:4;animation:tr 6s linear infinite}"
-          "@keyframes tr{from{stroke-dashoffset:4}to{stroke-dashoffset:-100}}")
-    d.css(K.REDUCED_MOTION_CSS)
-    d.add(f'<path d="M{f(x0 - 4 if not mob else 0)} {base_y}H{f(x1 + 4 if not mob else 308)}" stroke="{c["strand"]}" stroke-width="1" stroke-opacity=".3" fill="none"/>')
-    d.add(f'<path d="{curve}L{f(xs[-1])} {base_y}L{f(xs[0])} {base_y}Z" fill="{c["strand"]}" fill-opacity=".06"/>')
-    d.add(f'<path d="{curve}" fill="none" stroke="{c["strand"]}" stroke-width="1.5" stroke-opacity=".85" stroke-linejoin="round"/>')
-    d.add(f'<path class="tr" d="{curve}" pathLength="100" fill="none" stroke="{c["accent"]}" stroke-width="2" stroke-linecap="round"/>')
-    for i, (x, y) in enumerate(pts):
-        if counts[i] > 0 and i != n - 1:
-            d.add(f'<circle cx="{f(x)}" cy="{f(y)}" r="2" fill="{c["strand"]}"/>')
-    d.add(f'<circle class="br" cx="{f(xs[-1])}" cy="{f(ys[-1])}" r="4.5" fill="none" stroke="{c["accent"]}" stroke-width="1.2"/>')
-    d.add(f'<circle cx="{f(xs[-1])}" cy="{f(ys[-1])}" r="4.5" fill="{c["accent"]}"/>')
-    # month axis: first week whose Thursday falls in a new month
-    seen = None
-    shown = 0
-    for i, w in enumerate(weeks):
-        dt = datetime.date.fromisoformat(w["start"]) + datetime.timedelta(days=3)
-        if dt.month != seen:
-            seen = dt.month
-            if (not mob) or shown % 2 == 0:
-                lbl = K.MONTHS_PT[dt.month - 1]
-                lw = m4.measure(lbl, fs)
-                d.add(d.text(max(xs[i], lw / 2), my, lbl, m4, fs, c["muted"], anchor="middle"))
-            shown += 1
-    ctx.emit(f"activity-{device}-{theme}.svg", d)
+        d.add(d.text(tx, 64, p["desc"], it, 15, ink))
+        d.add(dep(d, tx, 86, stack, 11, muted))
+        foot = 103.5
+    d.add(f'<line x1="0" y1="{foot}" x2="{W}" y2="{foot}" stroke="{ink}" stroke-dasharray="1 3" {CRISP}/>')
+    ctx.emit(f'proj-{p["slug"]}-{device}-{theme}.svg', d)
 
 
 # ------------------------------------------------------------------ run
@@ -536,11 +649,14 @@ def generate(snap: dict, content: dict) -> Ctx:
         for dev in ("desktop", "mobile"):
             for th in ("dark", "light"):
                 hero(ctx, dev, th)
-                for i, p in enumerate(ctx.projects):
-                    strip(ctx, dev, th, i, p)
-                activity(ctx, dev, th)
+                for p in ctx.projects:
+                    proj(ctx, dev, th, p)
+        stack_icons(ctx)
     except ValueError as e:  # svgkit: character without a glyph, SVG too big or malformed
         raise BuildError(str(e)) from e
+    expected = 4 + 4 * len(ctx.projects) + 2 * len(stack_icon_slugs(content))
+    if len(ctx.files) != expected:
+        raise BuildError(f"gerei {len(ctx.files)} arquivos, esperava {expected}")
     return ctx
 
 
@@ -570,12 +686,18 @@ def render_readme(content: dict) -> str:
     def pic(name: str, alt: str) -> str:
         return K.picture(name, alt, base)
 
+    def chip(item: dict) -> str:
+        slug = item["icon"]
+        return (f'<kbd><picture><source media="(prefers-color-scheme: dark)" srcset="{base}/stack-{slug}-dark.svg">'
+                f'<img src="{base}/stack-{slug}-light.svg" width="11" height="11" alt="" align="top"></picture> '
+                f'{e(item["name"])}</kbd>')
+
     blocks = [
         "<!-- Arquivo gerado por tools/build.py a partir de tools/content.json. "
         "Não edite à mão: edite o JSON e rode `uv run tools/build.py readme`. -->",
         "<p>\n" + pic("hero", content["alt"]["hero"]) + "\n</p>",
         e(content["lede"]),
-        "<p>" + " ".join(f'<a href="{e(x["url"])}"><kbd>{e(x["label"])} ↗</kbd></a>' for x in content["contacts"]) + "</p>",
+        "<p>" + " ".join(f'<a href="{e(x["url"])}"><kbd>{e(x["label"])}</kbd></a>' for x in content["contacts"]) + "</p>",
         f'## {lab["about"]}',
     ]
     blocks += [e(t) for t in content["about"]]
@@ -588,9 +710,7 @@ def render_readme(content: dict) -> str:
         f'[{e(s["title"])}]({s["url"]}) ({e(s["note"])})' for s in content["studies"]))
     blocks.append(f'## {lab["stack"]}')
     for gr in content["stack"]:
-        blocks.append(f'**{e(gr["group"])}**<br>\n' + " ".join(f"<kbd>{e(i)}</kbd>" for i in gr["items"]))
-    blocks.append(f'## {lab["activity_heading"]}')
-    blocks.append("<p>\n" + pic("activity", content["alt"]["activity"]) + "\n</p>")
+        blocks.append(f'**{e(gr["group"])}**<br>\n' + " ".join(chip(i) for i in gr["items"]))
     en = content["english"]
     blocks.append(
         f'<details>\n<summary><b>{e(en["summary"])}</b></summary>\n\n### {e(en["heading"])}\n\n{e(en["lede"])}\n\n'

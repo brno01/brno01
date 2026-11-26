@@ -1,0 +1,66 @@
+{
+  "source": "simple-icons 16.37.0",
+  "license": "CC0-1.0",
+  "icons": {
+    "python": {
+      "hex": "3776AB",
+      "letters": null
+    },
+    "typescript": {
+      "hex": "3178C6",
+      "letters": "ffffff"
+    },
+    "javascript": {
+      "hex": "F7DF1E",
+      "letters": "1a1a18"
+    },
+    "gnubash": {
+      "hex": "4EAA25",
+      "letters": null
+    },
+    "rust": {
+      "hex": "000000",
+      "letters": null
+    },
+    "nodedotjs": {
+      "hex": "5FA04E",
+      "letters": null
+    },
+    "nestjs": {
+      "hex": "E0234E",
+      "letters": null
+    },
+    "express": {
+      "hex": "000000",
+      "letters": null
+    },
+    "linux": {
+      "hex": "FCC624",
+      "letters": null
+    },
+    "docker": {
+      "hex": "2496ED",
+      "letters": null
+    },
+    "podman": {
+      "hex": "892CA0",
+      "letters": null
+    },
+    "tailscale": {
+      "hex": "242424",
+      "letters": null
+    },
+    "githubactions": {
+      "hex": "2088FF",
+      "letters": null
+    },
+    "git": {
+      "hex": "F05032",
+      "letters": null
+    },
+    "claude": {
+      "hex": "D97757",
+      "letters": null
+    }
+  }
+}

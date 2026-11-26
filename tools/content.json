@@ -1,11 +1,5 @@
 {
   "name": "Bruno Oliveira",
-  "tagline": "back-end · automação · infraestrutura",
-  "tagline_parts": [
-    "back-end",
-    "automação",
-    "infraestrutura"
-  ],
   "lede": "Desenvolvedor back-end com foco em automação e infraestrutura: Linux, homelab como código, CI/CD e integrações em Python e TypeScript.",
   "contacts": [
     {
@@ -30,7 +24,6 @@
       "slug": "kindle-monitor",
       "url": "https://github.com/brno01/kindle-monitor",
       "title": "kindle-monitor",
-      "kind": "hardware",
       "desc": "Kindle com jailbreak como monitor e-ink do homelab: CPU, RAM, GPU, discos e serviços.",
       "desc_short": "Kindle como painel e-ink do homelab",
       "stack": [
@@ -45,7 +38,6 @@
       "slug": "sinapses",
       "url": "https://github.com/brno01/sinapses",
       "title": "sinapses",
-      "kind": "biblioteca",
       "desc": "Fios animados em canvas que ligam nós de uma interface e mostram o estado de cada ligação.",
       "desc_short": "Fios animados entre nós de interface",
       "stack": [
@@ -60,7 +52,6 @@
       "slug": "tailnet-dns-failover",
       "url": "https://github.com/brno01/tailnet-dns-failover",
       "title": "tailnet-dns-failover",
-      "kind": "rede",
       "desc": "Failover de DNS: Pi-hole enquanto o host responde, resolvedor público quando ele cai.",
       "desc_short": "Failover de DNS: Pi-hole ou resolvedor público",
       "stack": [
@@ -75,7 +66,6 @@
       "slug": "galaxy-s10",
       "url": "https://github.com/brno01/galaxy-s10",
       "title": "galaxy-s10",
-      "kind": "nó remoto",
       "desc": "Celular sem tela como nó do homelab, com três caminhos de acesso remoto redundantes.",
       "desc_short": "Celular sem tela como nó do homelab",
       "stack": [
@@ -90,7 +80,6 @@
       "slug": "nomad",
       "url": "https://github.com/brno01/nomad",
       "title": "nomad",
-      "kind": "notebook",
       "desc": "Notebook com Bazzite: failover de DNS, exportador para o Obsidian e streaming de jogos.",
       "desc_short": "Ajustes de um notebook com Bazzite",
       "stack": [
@@ -105,7 +94,6 @@
       "slug": "dot-github",
       "url": "https://github.com/brno01/.github",
       "title": ".github",
-      "kind": "CI compartilhada",
       "desc": "Workflows reutilizáveis de segurança, revisão com Claude e releases para os repositórios.",
       "desc_short": "Workflows reutilizáveis para os repos",
       "stack": [
@@ -141,31 +129,76 @@
     {
       "group": "Linguagens",
       "items": [
-        "Python",
-        "TypeScript",
-        "JavaScript",
-        "Bash",
-        "Rust"
+        {
+          "name": "Python",
+          "icon": "python"
+        },
+        {
+          "name": "TypeScript",
+          "icon": "typescript"
+        },
+        {
+          "name": "JavaScript",
+          "icon": "javascript"
+        },
+        {
+          "name": "Bash",
+          "icon": "gnubash"
+        },
+        {
+          "name": "Rust",
+          "icon": "rust"
+        }
       ]
     },
     {
       "group": "Back-end",
       "items": [
-        "Node.js",
-        "NestJS",
-        "Express"
+        {
+          "name": "Node.js",
+          "icon": "nodedotjs"
+        },
+        {
+          "name": "NestJS",
+          "icon": "nestjs"
+        },
+        {
+          "name": "Express",
+          "icon": "express"
+        }
       ]
     },
     {
       "group": "Infra e ferramentas",
       "items": [
-        "Linux",
-        "Docker",
-        "Podman",
-        "Tailscale",
-        "GitHub Actions",
-        "Git",
-        "Claude Code"
+        {
+          "name": "Linux",
+          "icon": "linux"
+        },
+        {
+          "name": "Docker",
+          "icon": "docker"
+        },
+        {
+          "name": "Podman",
+          "icon": "podman"
+        },
+        {
+          "name": "Tailscale",
+          "icon": "tailscale"
+        },
+        {
+          "name": "GitHub Actions",
+          "icon": "githubactions"
+        },
+        {
+          "name": "Git",
+          "icon": "git"
+        },
+        {
+          "name": "Claude Code",
+          "icon": "claude"
+        }
       ]
     }
   ],
@@ -174,17 +207,16 @@
     "about": "Sobre",
     "projects": "Projetos",
     "stack": "Stack",
-    "activity_heading": "Atividade",
     "also_private": "Também construí (privados)",
     "studies": "Estudos",
     "hub": "brno01",
-    "active_line": "{n} de 6 projetos com push nos últimos 14 dias",
-    "push": "push",
-    "contrib_line": "contribuições em 12 meses"
+    "contrib_line": "contribuições em 12 meses",
+    "public_repos": "projetos públicos",
+    "last_push": "último push",
+    "most_recent": "mais recente"
   },
   "alt": {
-    "hero": "Bruno Oliveira, desenvolvedor back-end em automação e infraestrutura. Arte de abertura do perfil.",
-    "activity": "Gráfico de atividade no GitHub nas últimas 26 semanas."
+    "hero": "Bruno Oliveira, desenvolvedor back-end em automação e infraestrutura. Arte de abertura do perfil."
   },
   "english": {
     "summary": "English",

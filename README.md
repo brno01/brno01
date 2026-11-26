@@ -11,7 +11,7 @@
 
 Desenvolvedor back-end com foco em automação e infraestrutura: Linux, homelab como código, CI/CD e integrações em Python e TypeScript.
 
-<p><a href="https://www.linkedin.com/in/brno01oliveira/"><kbd>LinkedIn ↗</kbd></a> <a href="mailto:contato.bruno0dev@gmail.com"><kbd>E-mail ↗</kbd></a> <a href="https://discord.gg/nQEaSHMcnp"><kbd>Discord ↗</kbd></a></p>
+<p><a href="https://www.linkedin.com/in/brno01oliveira/"><kbd>LinkedIn</kbd></a> <a href="mailto:contato.bruno0dev@gmail.com"><kbd>E-mail</kbd></a> <a href="https://discord.gg/nQEaSHMcnp"><kbd>Discord</kbd></a></p>
 
 ## Sobre
 
@@ -82,24 +82,13 @@ Gosto de problemas que juntam código e sistema: servidores, redes, automações
 ## Stack
 
 **Linguagens**<br>
-<kbd>Python</kbd> <kbd>TypeScript</kbd> <kbd>JavaScript</kbd> <kbd>Bash</kbd> <kbd>Rust</kbd>
+<kbd><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/brno01/brno01/output/stack-python-dark.svg"><img src="https://raw.githubusercontent.com/brno01/brno01/output/stack-python-light.svg" width="11" height="11" alt="" align="top"></picture> Python</kbd> <kbd><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/brno01/brno01/output/stack-typescript-dark.svg"><img src="https://raw.githubusercontent.com/brno01/brno01/output/stack-typescript-light.svg" width="11" height="11" alt="" align="top"></picture> TypeScript</kbd> <kbd><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/brno01/brno01/output/stack-javascript-dark.svg"><img src="https://raw.githubusercontent.com/brno01/brno01/output/stack-javascript-light.svg" width="11" height="11" alt="" align="top"></picture> JavaScript</kbd> <kbd><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/brno01/brno01/output/stack-gnubash-dark.svg"><img src="https://raw.githubusercontent.com/brno01/brno01/output/stack-gnubash-light.svg" width="11" height="11" alt="" align="top"></picture> Bash</kbd> <kbd><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/brno01/brno01/output/stack-rust-dark.svg"><img src="https://raw.githubusercontent.com/brno01/brno01/output/stack-rust-light.svg" width="11" height="11" alt="" align="top"></picture> Rust</kbd>
 
 **Back-end**<br>
-<kbd>Node.js</kbd> <kbd>NestJS</kbd> <kbd>Express</kbd>
+<kbd><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/brno01/brno01/output/stack-nodedotjs-dark.svg"><img src="https://raw.githubusercontent.com/brno01/brno01/output/stack-nodedotjs-light.svg" width="11" height="11" alt="" align="top"></picture> Node.js</kbd> <kbd><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/brno01/brno01/output/stack-nestjs-dark.svg"><img src="https://raw.githubusercontent.com/brno01/brno01/output/stack-nestjs-light.svg" width="11" height="11" alt="" align="top"></picture> NestJS</kbd> <kbd><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/brno01/brno01/output/stack-express-dark.svg"><img src="https://raw.githubusercontent.com/brno01/brno01/output/stack-express-light.svg" width="11" height="11" alt="" align="top"></picture> Express</kbd>
 
 **Infra e ferramentas**<br>
-<kbd>Linux</kbd> <kbd>Docker</kbd> <kbd>Podman</kbd> <kbd>Tailscale</kbd> <kbd>GitHub Actions</kbd> <kbd>Git</kbd> <kbd>Claude Code</kbd>
-
-## Atividade
-
-<p>
-<picture>
-  <source media="(max-width: 767px) and (prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/brno01/brno01/output/activity-mobile-dark.svg">
-  <source media="(max-width: 767px)" srcset="https://raw.githubusercontent.com/brno01/brno01/output/activity-mobile-light.svg">
-  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/brno01/brno01/output/activity-desktop-dark.svg">
-  <img src="https://raw.githubusercontent.com/brno01/brno01/output/activity-desktop-light.svg" width="100%" alt="Gráfico de atividade no GitHub nas últimas 26 semanas.">
-</picture>
-</p>
+<kbd><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/brno01/brno01/output/stack-linux-dark.svg"><img src="https://raw.githubusercontent.com/brno01/brno01/output/stack-linux-light.svg" width="11" height="11" alt="" align="top"></picture> Linux</kbd> <kbd><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/brno01/brno01/output/stack-docker-dark.svg"><img src="https://raw.githubusercontent.com/brno01/brno01/output/stack-docker-light.svg" width="11" height="11" alt="" align="top"></picture> Docker</kbd> <kbd><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/brno01/brno01/output/stack-podman-dark.svg"><img src="https://raw.githubusercontent.com/brno01/brno01/output/stack-podman-light.svg" width="11" height="11" alt="" align="top"></picture> Podman</kbd> <kbd><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/brno01/brno01/output/stack-tailscale-dark.svg"><img src="https://raw.githubusercontent.com/brno01/brno01/output/stack-tailscale-light.svg" width="11" height="11" alt="" align="top"></picture> Tailscale</kbd> <kbd><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/brno01/brno01/output/stack-githubactions-dark.svg"><img src="https://raw.githubusercontent.com/brno01/brno01/output/stack-githubactions-light.svg" width="11" height="11" alt="" align="top"></picture> GitHub Actions</kbd> <kbd><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/brno01/brno01/output/stack-git-dark.svg"><img src="https://raw.githubusercontent.com/brno01/brno01/output/stack-git-light.svg" width="11" height="11" alt="" align="top"></picture> Git</kbd> <kbd><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/brno01/brno01/output/stack-claude-dark.svg"><img src="https://raw.githubusercontent.com/brno01/brno01/output/stack-claude-light.svg" width="11" height="11" alt="" align="top"></picture> Claude Code</kbd>
 
 <details>
 <summary><b>English</b></summary>

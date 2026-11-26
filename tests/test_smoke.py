@@ -33,12 +33,12 @@ def _digest(directory: Path) -> str:
     return h.hexdigest()
 
 
-def test_generates_32_files_from_fixture(tmp_path):
+def test_generates_58_files_from_fixture(tmp_path):
     out = tmp_path / "dist"
     assert build.main(["assets", "--snapshot", str(SNAPSHOT), "--out", str(out)]) == 0
     files = sorted(p.name for p in out.iterdir())
-    assert len(files) == 32
-    assert "hero-desktop-dark.svg" in files and "activity-mobile-light.svg" in files
+    assert len(files) == 58
+    assert "hero-desktop-dark.svg" in files and "stack-python-light.svg" in files
     assert all(p.stat().st_size <= 60_000 for p in out.iterdir())
     assert not any(p.suffix != ".svg" for p in out.iterdir())
 

@@ -1,10 +1,11 @@
 """README rendering: structure, accessibility and the subset of HTML that GitHub accepts."""
+import re
 from html.parser import HTMLParser
 
 import pytest
 
 ALLOWED_TAGS = {"p", "a", "picture", "source", "img", "kbd", "details", "summary", "b", "sub", "br"}
-ALLOWED_ATTRS = {"href", "media", "srcset", "src", "width", "alt"}
+ALLOWED_ATTRS = {"href", "media", "srcset", "src", "width", "height", "alt", "align"}
 VOID = {"source", "img", "br"}
 
 
@@ -81,18 +82,31 @@ def test_only_github_safe_html(scan, readme):
         assert banned not in readme
 
 
-def test_every_img_has_alt_and_full_width(scan):
-    assert len(scan.imgs) == 8  # hero + six projects + activity
-    for img in scan.imgs:
+def _art_imgs(scan):
+    return [i for i in scan.imgs if i.get("width") == "100%"]
+
+
+def _chip_imgs(scan):
+    return [i for i in scan.imgs if i.get("width") == "11"]
+
+
+def test_every_img_has_alt_and_a_known_size(scan):
+    assert len(scan.imgs) == 7 + 15  # hero + six projects, and one icon per stack chip
+    assert len(_art_imgs(scan)) == 7 and len(_chip_imgs(scan)) == 15
+    for img in _art_imgs(scan):
         assert img.get("alt", "").strip()
-        assert img.get("width") == "100%"
+    for img in _chip_imgs(scan):
+        # decorative: the name follows the icon
+        assert img.get("alt") == "" and img.get("height") == "11" and img.get("align") == "top"
 
 
 def test_picture_structure(scan):
-    assert len(scan.pictures) == len(scan.imgs) == 8
-    for pic in scan.pictures:
+    assert len(scan.pictures) == len(scan.imgs) == 22
+    art = [p for p in scan.pictures if len([x for x in p if isinstance(x, dict)]) == 3]
+    chips = [p for p in scan.pictures if len([x for x in p if isinstance(x, dict)]) == 1]
+    assert len(art) == 7 and len(chips) == 15
+    for pic in art:
         sources = [x for x in pic if isinstance(x, dict)]
-        assert len(sources) == 3
         assert [s["media"] for s in sources] == [
             "(max-width: 767px) and (prefers-color-scheme: dark)",
             "(max-width: 767px)",
@@ -101,6 +115,10 @@ def test_picture_structure(scan):
         assert [s["srcset"].rsplit("-", 2)[1:] for s in sources] == [
             ["mobile", "dark.svg"], ["mobile", "light.svg"], ["desktop", "dark.svg"]]
         assert pic[-1] == "img"
+    for pic in chips:
+        (source,) = [x for x in pic if isinstance(x, dict)]
+        assert source["media"] == "(prefers-color-scheme: dark)" and source["srcset"].endswith("-dark.svg")
+        assert pic[-1] == "img" and pic.index("img") > pic.index(source)  # <source> comes before <img>
 
 
 def test_all_image_urls_use_assets_base(scan, content):
@@ -115,7 +133,48 @@ def test_referenced_files_equal_generated_files(scan, content, assets):
     base = content["assets_base"]
     referenced = {s[len(base):] for s in scan.srcs}
     assert referenced == set(assets)
-    assert len(referenced) == 32
+    assert len(referenced) == 58
+
+
+def test_chip_markup_per_item(readme, content):
+    base = content["assets_base"].rstrip("/")
+    n = 0
+    for gr in content["stack"]:
+        for it in gr["items"]:
+            n += 1
+            chip = (f'<kbd><picture><source media="(prefers-color-scheme: dark)" srcset="{base}/stack-{it["icon"]}-dark.svg">'
+                    f'<img src="{base}/stack-{it["icon"]}-light.svg" width="11" height="11" alt="" align="top"></picture> '
+                    f'{it["name"]}</kbd>')
+            assert chip in readme, it["name"]
+    assert n == 15
+    assert readme.count("<kbd><picture>") == 15
+
+
+def test_contacts_are_kbd_links_without_arrow(readme, content):
+    assert "↗" not in readme
+    for c in content["contacts"]:
+        assert f'<a href="{c["url"]}"><kbd>{c["label"]}</kbd></a>' in readme
+
+
+def test_section_order_and_no_activity_section(readme, content):
+    lab = content["labels"]
+    marks = [readme.index(m) for m in (
+        "<picture>", content["lede"], f'## {lab["about"]}', f'## {lab["projects"]}', f'**{lab["also_private"]}**',
+        f'**{lab["studies"]}:**', f'## {lab["stack"]}', "<details>", "<sub>")]
+    assert marks == sorted(marks)
+    assert readme.index("<picture>") < readme.index(content["lede"])
+    assert "Atividade" not in readme and "activity" not in readme.lower()
+
+
+def test_projects_are_six_linked_pictures_in_one_paragraph(readme, content):
+    start = readme.index(f'## {content["labels"]["projects"]}')
+    block = readme[start:readme.index("**", start + 10)]
+    assert block.count("<p>") == 1 and block.count("</p>") == 1
+    assert block.count("<picture>") == 6 and block.count("<a href=") == 6
+
+
+def test_hero_picture_is_in_a_paragraph(readme):
+    assert readme.split("\n\n")[1].startswith("<p>\n<picture>")
 
 
 def test_english_block_inside_details(readme, content, scan):
