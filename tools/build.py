@@ -3,7 +3,7 @@
 # requires-python = ">=3.11"
 # dependencies = ["fonttools==4.69.1"]
 # ///
-"""Profile README generator: the 66 SVG art files and README.md.
+"""Profile README generator: the 82 SVG art files and README.md.
 
     tools/build.py assets --snapshot FILE --out DIR   write the SVG files (flat) into DIR
     tools/build.py readme [--check]                   write README.md (--check only compares)
@@ -141,11 +141,12 @@ CONTENT_SCHEMA = {
     "also_private": _LIST_STR, "login": _STR, "assets_base": _STR, "footer": _STR,
     "contacts": [{"label": _STR, "url": _STR, "icon": _STR}],
     "projects": [{"slug": _STR, "url": _STR, "title": _STR, "desc": _STR, "desc_short": _STR,
-                  "stack": _LIST_STR, "alt": _STR, "repo": _STR}],
+                  "details": _STR, "stack": _LIST_STR, "alt": _STR, "repo": _STR}],
     "studies": [{"title": _STR, "url": _STR, "note": _STR}],
     "stack": [{"group": _STR, "items": [{"name": _STR, "icon": _STR}]}],
     "labels": {k: _STR for k in ("updated", "about", "projects", "stack", "also_private", "studies", "hub",
-                                 "contrib_line", "public_repos", "last_push", "most_recent")},
+                                 "contrib_line", "public_repos", "last_push", "most_recent",
+                                 "projects_details")},
     "alt": {"hero": _STR},
     "english": {"summary": _STR, "heading": _STR, "lede": _STR, "about": _LIST_STR, "closing": _STR},
 }
@@ -704,6 +705,10 @@ def render_readme(content: dict) -> str:
     blocks.append(f'## {lab["projects"]}')
     blocks.append("<p>\n" + "\n".join(
         f'<a href="{e(p["url"])}">\n{pic("proj-" + p["slug"], p["alt"])}\n</a>' for p in content["projects"]) + "\n</p>")
+    # the art shows the short description; the full one stays one click away, as real text
+    blocks.append(f'<details>\n<summary><b>{e(lab["projects_details"])}</b></summary>\n\n'
+                  + "\n".join(f'- **[{e(p["title"])}]({p["url"]})**: {e(p["details"])}' for p in content["projects"])
+                  + "\n\n</details>")
     blocks.append(f'**{lab["also_private"]}**')
     blocks.append("\n".join(f"- {e(t)}" for t in content["also_private"]))
     blocks.append(f'**{lab["studies"]}:** ' + ", ".join(

@@ -326,7 +326,7 @@ def _icons_copy(tmp_path):
 def test_every_stack_icon_has_a_source_and_metadata(build, content):
     meta = build.load_icon_meta()
     slugs = build.icon_slugs(content)
-    assert len(slugs) == 19
+    assert len(slugs) == 27
     for slug in slugs:
         assert slug in meta
         assert build.read_icon_path(slug)
@@ -442,4 +442,10 @@ def test_readme_refuses_an_unsafe_icon_slug(build, content, icon):
 
 def test_generate_checks_the_number_of_files(build, content, snapshot_data, monkeypatch):
     monkeypatch.setattr(build, "emit_icons", lambda ctx: None)
-    assert "esperava 66" in _gen_error(build, content, snapshot_data)
+    assert "esperava 82" in _gen_error(build, content, snapshot_data)
+
+
+def test_project_details_are_required(build, content, snapshot_data):
+    bad = _copy(content)
+    del bad["projects"][0]["details"]
+    assert "details" in _gen_error(build, bad, snapshot_data)
