@@ -3,7 +3,7 @@ name: profile
 # Two jobs on purpose: the job that runs the repository's code and its dependencies
 # (build) can only read; the job that writes to the output branch (publish) runs
 # nothing from the repository, it only publishes what the first job produced, after a
-# shell-only check that the artifact is exactly 82 flat, regular, lowercase-named .svg files.
+# shell-only check that the artifact is exactly 130 flat, regular, lowercase-named .svg files.
 
 on:
   pull_request:
@@ -91,8 +91,8 @@ jobs:
           if find . -mindepth 1 \( ! -type f -o ! -regex '\./[a-z0-9][a-z0-9-]*\.svg' \) -print | grep -q .; then
             echo "::error::unexpected content in the artifact"; exit 1
           fi
-          # 82 = (hero + 6 projects) in desktop/mobile x dark/light (28) + 27 icons (4 contacts, 23 stack) x light/dark (54), see tools/build.py
-          [ "$(find . -type f | wc -l)" -eq 82 ] || { echo "::error::expected 82 files"; exit 1; }
+          # 130 = (hero + 6 projects) in desktop/mobile x dark/light (28) + 51 icons (4 contacts, 47 stack) x light/dark (102), see tools/build.py
+          [ "$(find . -type f | wc -l)" -eq 130 ] || { echo "::error::expected 130 files"; exit 1; }
           git init --quiet --initial-branch=output
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"

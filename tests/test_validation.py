@@ -104,13 +104,32 @@ def test_missing_content_key_names_the_path(build, content, snapshot_data):
     assert "assets_base" in _gen_error(build, bad, snapshot_data)
 
 
-def test_stack_item_must_be_an_object_with_name_and_icon(build, content, snapshot_data):
+def test_stack_item_must_be_an_object_with_a_name(build, content, snapshot_data):
     bad = _copy(content)
     bad["stack"][0]["items"][0] = "Python"
     assert "stack[0].items[0]" in _gen_error(build, bad, snapshot_data)
     bad = _copy(content)
-    del bad["stack"][1]["items"][2]["icon"]
-    assert "stack[1].items[2].icon" in _gen_error(build, bad, snapshot_data)
+    del bad["stack"][2]["items"][2]["name"]
+    assert "stack[2].items[2].name" in _gen_error(build, bad, snapshot_data)
+
+
+def test_stack_icon_is_optional_but_must_be_text(build, content):
+    plain = _copy(content)
+    item = plain["stack"][2]["items"][2]
+    del item["icon"]
+    build.validate_content(plain)
+    assert f'<kbd>{item["name"]}</kbd>' in build.render_readme(plain)
+    bad = _copy(content)
+    bad["stack"][0]["items"][0]["icon"] = 7
+    with pytest.raises(build.BuildError, match="inválido"):
+        build.validate_content(bad)
+
+
+def test_private_project_needs_every_key(build, content, snapshot_data):
+    for key in ("title", "desc", "details", "stack"):
+        bad = _copy(content)
+        del bad["also_private"][0][key]
+        assert f"also_private[0].{key}" in _gen_error(build, bad, snapshot_data)
 
 
 def test_new_labels_are_required(build, content, snapshot_data):
@@ -326,7 +345,7 @@ def _icons_copy(tmp_path):
 def test_every_stack_icon_has_a_source_and_metadata(build, content):
     meta = build.load_icon_meta()
     slugs = build.icon_slugs(content)
-    assert len(slugs) == 27
+    assert len(slugs) == 51
     for slug in slugs:
         assert slug in meta
         assert build.read_icon_path(slug)
@@ -354,7 +373,7 @@ def test_icon_with_metadata_but_no_svg_file(build, content, snapshot_data, tmp_p
 
 @pytest.mark.parametrize("svg,expect", [
     ('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><title>x</title><path d="M0 0"/></svg>', "viewBox"),
-    ('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M0 0"/></svg>', "title"),
+    ('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M0 0"/><title>x</title></svg>', "title"),
     ('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><title>x</title><path d="M0 0"/><path d="M1 1"/></svg>', "title"),
     ('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><title>x</title><circle r="1"/></svg>', "title"),
     ('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><title>x</title><path d="M0 0 &lt;script&gt;"/></svg>', "caracteres"),
@@ -442,10 +461,32 @@ def test_readme_refuses_an_unsafe_icon_slug(build, content, icon):
 
 def test_generate_checks_the_number_of_files(build, content, snapshot_data, monkeypatch):
     monkeypatch.setattr(build, "emit_icons", lambda ctx: None)
-    assert "esperava 82" in _gen_error(build, content, snapshot_data)
+    assert "esperava 130" in _gen_error(build, content, snapshot_data)
 
 
 def test_project_details_are_required(build, content, snapshot_data):
     bad = _copy(content)
     del bad["projects"][0]["details"]
     assert "details" in _gen_error(build, bad, snapshot_data)
+
+
+def test_devicon_shape_is_accepted_and_keeps_its_viewbox(build):
+    meta = build.load_icon_meta()
+    d, box = build.read_icon("playwright")
+    assert box == 128 and d
+    svg = build.icon_svg("playwright", meta["playwright"], d, "dark", box).decode()
+    assert 'viewBox="0 0 128 128" width="24" height="24"' in svg
+
+
+def test_icon_with_unknown_viewbox_or_letters_on_devicon_is_refused(build, tmp_path):
+    (tmp_path / "odd.svg").write_text(
+        '<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><path d="M0 0h1"/></svg>', encoding="utf-8")
+    with pytest.raises(build.BuildError, match="viewBox"):
+        build.read_icon("odd", tmp_path)
+    (tmp_path / "two.svg").write_text(
+        '<svg viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg"><path d="M0 0h1"/><path d="M1 1h1"/></svg>',
+        encoding="utf-8")
+    with pytest.raises(build.BuildError, match="exatamente um <path>"):
+        build.read_icon("two", tmp_path)
+    with pytest.raises(build.BuildError, match="letters"):
+        build.icon_svg("dev", {"hex": "2EAD33", "letters": "ffffff"}, "M0 0h1", "dark", 128)

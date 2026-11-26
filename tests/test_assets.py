@@ -25,13 +25,13 @@ def _split(name):
 
 def test_expected_file_set(assets, content):
     slugs = [p["slug"] for p in content["projects"]]
-    icons = sorted({c["icon"] for c in content["contacts"]} | {i["icon"] for g in content["stack"] for i in g["items"]})
+    icons = sorted({c["icon"] for c in content["contacts"]} | {i["icon"] for g in content["stack"] for i in g["items"] if "icon" in i})
     art = {f"{k}-{d}-{t}.svg" for k in ["hero"] + [f"proj-{s}" for s in slugs]
            for d in ("desktop", "mobile") for t in ("dark", "light")}
     stack = {f"icon-{i}-{t}.svg" for i in icons for t in ("light", "dark")}
-    assert len(slugs) == 6 and len(icons) == 27
-    assert len(art) == 28 and len(stack) == 54
-    assert set(assets) == art | stack and len(assets) == 82
+    assert len(slugs) == 6 and len(icons) == 51
+    assert len(art) == 28 and len(stack) == 102
+    assert set(assets) == art | stack and len(assets) == 130
     assert not any(n.startswith("activity-") for n in assets)
 
 
@@ -96,7 +96,7 @@ def test_art_has_role_img_and_label(assets, content):
 
 def test_icons_are_decorative(assets):
     icons = _icons(assets)
-    assert len(icons) == 54
+    assert len(icons) == 102
     for name, text in icons.items():
         root = ET.fromstring(text)
         assert root.get("aria-hidden") == "true", name
@@ -129,13 +129,15 @@ def test_fixed_heights(assets):
 def test_icon_dimensions(assets):
     for name, text in _icons(assets).items():
         root = ET.fromstring(text)
-        assert (root.get("width"), root.get("height"), root.get("viewBox")) == ("24", "24", "0 0 24 24"), name
+        # the source's own square viewBox (24, 128 or 256), always rendered at 24x24
+        assert (root.get("width"), root.get("height")) == ("24", "24"), name
+        assert root.get("viewBox") in ("0 0 24 24", "0 0 128 128", "0 0 256 256"), name
 
 
 def test_size_budget(assets):
     sizes = {n: len(t.encode("utf-8")) for n, t in assets.items()}
     assert all(s <= 60_000 for s in sizes.values()), max(sizes.items(), key=lambda kv: kv[1])
-    assert sum(sizes.values()) <= 700_000
+    assert sum(sizes.values()) <= 760_000  # 7 art pictures x 4 variants, plus 51 icons x 2
 
 
 def test_dark_and_light_differ_only_in_colors(assets, build):

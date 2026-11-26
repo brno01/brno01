@@ -1,5 +1,5 @@
 {
-  "source": "simple-icons 16.37.0; linkedin.svg is an original drawing, CC0 like the rest",
+  "source": "simple-icons 16.37.0; playwright.svg and systemd.svg from devicon (MIT); sql.svg from Material Symbols (Apache-2.0); apachecamel.svg reduced to one colour from gilbarbara/logos (CC0); linkedin.svg is an original drawing (CC0). Origin of each non-simple-icons file: SOURCES.md",
   "license": "CC0-1.0",
   "icons": {
     "python": {
@@ -108,6 +108,102 @@
     },
     "jest": {
       "hex": "C21325",
+      "letters": null
+    },
+    "fastify": {
+      "hex": "000000",
+      "letters": null
+    },
+    "typeorm": {
+      "hex": "FE0803",
+      "letters": null
+    },
+    "swagger": {
+      "hex": "85EA2D",
+      "letters": null
+    },
+    "mariadb": {
+      "hex": "003545",
+      "letters": null
+    },
+    "redis": {
+      "hex": "FF4438",
+      "letters": null
+    },
+    "supabase": {
+      "hex": "3FCF8E",
+      "letters": null
+    },
+    "reactquery": {
+      "hex": "FF4154",
+      "letters": null
+    },
+    "testinglibrary": {
+      "hex": "E33332",
+      "letters": null
+    },
+    "webdriverio": {
+      "hex": "EA5906",
+      "letters": null
+    },
+    "mockserviceworker": {
+      "hex": "FF6A33",
+      "letters": null
+    },
+    "pandas": {
+      "hex": "150458",
+      "letters": null
+    },
+    "n8n": {
+      "hex": "FF91AC",
+      "letters": null
+    },
+    "ollama": {
+      "hex": "000000",
+      "letters": null
+    },
+    "bitbucket": {
+      "hex": "0052CC",
+      "letters": null
+    },
+    "tmux": {
+      "hex": "1BB91F",
+      "letters": null
+    },
+    "uv": {
+      "hex": "DE5FE9",
+      "letters": null
+    },
+    "playwright": {
+      "hex": "2EAD33",
+      "letters": null
+    },
+    "sql": {
+      "hex": "57606A",
+      "letters": null
+    },
+    "apachecamel": {
+      "hex": "F69923",
+      "letters": null
+    },
+    "systemd": {
+      "hex": "30D475",
+      "letters": null
+    },
+    "linuxcontainers": {
+      "hex": "333333",
+      "letters": null
+    },
+    "tokio": {
+      "hex": "000000",
+      "letters": null
+    },
+    "flutter": {
+      "hex": "02569B",
+      "letters": null
+    },
+    "dart": {
+      "hex": "0175C2",
       "letters": null
     }
   }

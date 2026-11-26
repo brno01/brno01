@@ -91,8 +91,8 @@ def _chip_imgs(scan):
 
 
 def test_every_img_has_alt_and_a_known_size(scan):
-    assert len(scan.imgs) == 7 + 4 + 23  # hero + six projects, one icon per contact and per stack chip
-    assert len(_art_imgs(scan)) == 7 and len(_chip_imgs(scan)) == 27
+    assert len(scan.imgs) == 7 + 4 + 47  # hero + six projects, one icon per contact and per stack chip with an icon
+    assert len(_art_imgs(scan)) == 7 and len(_chip_imgs(scan)) == 51
     for img in _art_imgs(scan):
         assert img.get("alt", "").strip()
     for img in _chip_imgs(scan):
@@ -101,10 +101,10 @@ def test_every_img_has_alt_and_a_known_size(scan):
 
 
 def test_picture_structure(scan):
-    assert len(scan.pictures) == len(scan.imgs) == 34
+    assert len(scan.pictures) == len(scan.imgs) == 58
     art = [p for p in scan.pictures if len([x for x in p if isinstance(x, dict)]) == 3]
     chips = [p for p in scan.pictures if len([x for x in p if isinstance(x, dict)]) == 1]
-    assert len(art) == 7 and len(chips) == 27
+    assert len(art) == 7 and len(chips) == 51
     for pic in art:
         sources = [x for x in pic if isinstance(x, dict)]
         assert [s["media"] for s in sources] == [
@@ -133,21 +133,25 @@ def test_referenced_files_equal_generated_files(scan, content, assets):
     base = content["assets_base"]
     referenced = {s[len(base):] for s in scan.srcs}
     assert referenced == set(assets)
-    assert len(referenced) == 82
+    assert len(referenced) == 130
 
 
 def test_chip_markup_per_item(readme, content):
     base = content["assets_base"].rstrip("/")
-    n = 0
+    n = plain = 0
     for gr in content["stack"]:
         for it in gr["items"]:
+            if "icon" not in it:
+                plain += 1
+                assert f'<kbd>{it["name"]}</kbd>' in readme, it["name"]
+                continue
             n += 1
             chip = (f'<kbd><picture><source media="(prefers-color-scheme: dark)" srcset="{base}/icon-{it["icon"]}-dark.svg">'
                     f'<img src="{base}/icon-{it["icon"]}-light.svg" width="11" height="11" alt="" align="top"></picture> '
                     f'{it["name"]}</kbd>')
             assert chip in readme, it["name"]
-    assert n == 23
-    assert readme.count("<kbd><picture>") == 23 + len(content["contacts"])
+    assert n == 47 and plain == 0
+    assert readme.count("<kbd><picture>") == 47 + len(content["contacts"])
 
 
 def test_contacts_are_kbd_links_with_an_icon_and_no_arrow(readme, content):
@@ -191,7 +195,7 @@ def test_english_block_inside_details(readme, content, scan):
     end = readme.index("</details>", start)
     for needle in (en["summary"], en["heading"], en["lede"], en["closing"]):
         assert start < readme.index(needle, start) < end
-    assert readme.count("<details>") == 2  # project details and English
+    assert readme.count("<details>") == 3  # public details, private details and English
     assert "<summary><b>" in readme[start:end]
     # no English text leaks outside the block
     assert en["lede"] not in readme[:start] + readme[end:]
@@ -225,4 +229,18 @@ def test_readme_names_no_dns_server_or_os_of_a_machine(readme):
 
 
 def test_readme_has_no_footer(readme):
-    assert "<sub>" not in readme
+    assert "<p><sub>" not in readme
+    assert readme.rstrip().endswith("</details>")  # the English block is the last thing
+
+
+def test_private_projects_have_no_link_and_show_their_stack(readme, content):
+    lab = content["labels"]
+    start = readme.index(f'**{lab["also_private"]}**')
+    end = readme.index(f'**{lab["studies"]}:**')
+    section = readme[start:end]
+    assert "](" not in section and "href" not in section  # a private repository would be a 404
+    for p in content["also_private"]:
+        assert f'- **{p["title"]}**: {p["desc"]}<br>\n  <sub>{", ".join(p["stack"])}</sub>' in section
+    details = section[section.index(f'<summary><b>{lab["private_details"]}</b></summary>'):]
+    for p in content["also_private"]:
+        assert f'- **{p["title"]}**: {p["details"]}' in details
