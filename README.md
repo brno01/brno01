@@ -1,15 +1,17 @@
-<h1 align="center">Bruno Oliveira</h1>
+<!-- Arquivo gerado por tools/build.py a partir de tools/content.json. Não edite à mão: edite o JSON e rode `uv run tools/build.py readme`. -->
 
-<p align="center">
-  Desenvolvedor back-end com foco em <b>automação e infraestrutura</b>:<br>
-  Linux, homelab como código, CI/CD e integrações em Python e TypeScript.
+<p>
+<picture>
+  <source media="(max-width: 767px) and (prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/brno01/brno01/output/hero-mobile-dark.svg">
+  <source media="(max-width: 767px)" srcset="https://raw.githubusercontent.com/brno01/brno01/output/hero-mobile-light.svg">
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/brno01/brno01/output/hero-desktop-dark.svg">
+  <img src="https://raw.githubusercontent.com/brno01/brno01/output/hero-desktop-light.svg" width="100%" alt="Bruno Oliveira, desenvolvedor back-end em automação e infraestrutura. Arte de abertura do perfil.">
+</picture>
 </p>
 
-<p align="center">
-  <a href="https://www.linkedin.com/in/brno01oliveira/"><img alt="LinkedIn" src="https://img.shields.io/badge/LinkedIn-0A66C2?style=for-the-badge"></a>
-  <a href="mailto:contato.bruno0dev@gmail.com"><img alt="E-mail" src="https://img.shields.io/badge/E--mail-333333?style=for-the-badge&logo=gmail&logoColor=white"></a>
-  <a href="https://discord.gg/nQEaSHMcnp"><img alt="Discord" src="https://img.shields.io/badge/Discord-5865F2?style=for-the-badge&logo=discord&logoColor=white"></a>
-</p>
+Desenvolvedor back-end com foco em automação e infraestrutura: Linux, homelab como código, CI/CD e integrações em Python e TypeScript.
+
+<p><a href="https://www.linkedin.com/in/brno01oliveira/"><kbd>LinkedIn ↗</kbd></a> <a href="mailto:contato.bruno0dev@gmail.com"><kbd>E-mail ↗</kbd></a> <a href="https://discord.gg/nQEaSHMcnp"><kbd>Discord ↗</kbd></a></p>
 
 ## Sobre
 
@@ -17,40 +19,94 @@ Trabalho com suporte técnico N2 e estou migrando para desenvolvimento. Fora do 
 
 Gosto de problemas que juntam código e sistema: servidores, redes, automações e as ferramentas que deixam tudo isso fácil de operar.
 
-## Projetos em destaque
+## Projetos
 
-| Projeto | O que faz | Stack |
-|---|---|---|
-| [kindle-monitor](https://github.com/brno01/kindle-monitor) | Kindle Paperwhite com jailbreak como monitor e-ink do homelab: CPU, RAM, GPU, discos, serviços e consumo do Claude Code, atualizado a cada minuto. | Python, shell, FBInk, Tailscale |
-| [sinapses](https://github.com/brno01/sinapses) | Fios animados em canvas que ligam nós de uma interface e mostram o estado de cada ligação. Publicado como pacote npm. | TypeScript, React, Canvas |
-| [tailnet-dns-failover](https://github.com/brno01/tailnet-dns-failover) | Failover de DNS da tailnet: usa o Pi-hole enquanto o host dele está no ar e um resolvedor público quando cai. | Shell, GitHub Actions, Tailscale |
-| [galaxy-s10](https://github.com/brno01/galaxy-s10) | Celular sem tela reaproveitado como nó do homelab, com três caminhos de acesso remoto redundantes. | Python, adb, Termux |
-| [nomad](https://github.com/brno01/nomad) | Ajustes de um notebook com Bazzite: failover de DNS, exportador de documentação para o Obsidian, streaming de jogos. | Python, Bash, Linux |
-| [.github](https://github.com/brno01/.github) | Workflows reutilizáveis usados por todos os meus repositórios: varredura de segurança, revisor com Claude e releases. | GitHub Actions |
+<p>
+<a href="https://github.com/brno01/kindle-monitor">
+<picture>
+  <source media="(max-width: 767px) and (prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/brno01/brno01/output/proj-kindle-monitor-mobile-dark.svg">
+  <source media="(max-width: 767px)" srcset="https://raw.githubusercontent.com/brno01/brno01/output/proj-kindle-monitor-mobile-light.svg">
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/brno01/brno01/output/proj-kindle-monitor-desktop-dark.svg">
+  <img src="https://raw.githubusercontent.com/brno01/brno01/output/proj-kindle-monitor-desktop-light.svg" width="100%" alt="kindle-monitor: Kindle como monitor e-ink do homelab. Stack: Python, Shell, FBInk.">
+</picture>
+</a>
+<a href="https://github.com/brno01/sinapses">
+<picture>
+  <source media="(max-width: 767px) and (prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/brno01/brno01/output/proj-sinapses-mobile-dark.svg">
+  <source media="(max-width: 767px)" srcset="https://raw.githubusercontent.com/brno01/brno01/output/proj-sinapses-mobile-light.svg">
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/brno01/brno01/output/proj-sinapses-desktop-dark.svg">
+  <img src="https://raw.githubusercontent.com/brno01/brno01/output/proj-sinapses-desktop-light.svg" width="100%" alt="sinapses: fios animados ligando nós de uma interface. Stack: TypeScript, React, Canvas.">
+</picture>
+</a>
+<a href="https://github.com/brno01/tailnet-dns-failover">
+<picture>
+  <source media="(max-width: 767px) and (prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/brno01/brno01/output/proj-tailnet-dns-failover-mobile-dark.svg">
+  <source media="(max-width: 767px)" srcset="https://raw.githubusercontent.com/brno01/brno01/output/proj-tailnet-dns-failover-mobile-light.svg">
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/brno01/brno01/output/proj-tailnet-dns-failover-desktop-dark.svg">
+  <img src="https://raw.githubusercontent.com/brno01/brno01/output/proj-tailnet-dns-failover-desktop-light.svg" width="100%" alt="tailnet-dns-failover: DNS que troca do Pi-hole para um resolvedor público. Stack: Shell, GitHub Actions, Tailscale.">
+</picture>
+</a>
+<a href="https://github.com/brno01/galaxy-s10">
+<picture>
+  <source media="(max-width: 767px) and (prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/brno01/brno01/output/proj-galaxy-s10-mobile-dark.svg">
+  <source media="(max-width: 767px)" srcset="https://raw.githubusercontent.com/brno01/brno01/output/proj-galaxy-s10-mobile-light.svg">
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/brno01/brno01/output/proj-galaxy-s10-desktop-dark.svg">
+  <img src="https://raw.githubusercontent.com/brno01/brno01/output/proj-galaxy-s10-desktop-light.svg" width="100%" alt="galaxy-s10: celular sem tela como nó do homelab, com três acessos remotos. Stack: Python, adb, Termux.">
+</picture>
+</a>
+<a href="https://github.com/brno01/nomad">
+<picture>
+  <source media="(max-width: 767px) and (prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/brno01/brno01/output/proj-nomad-mobile-dark.svg">
+  <source media="(max-width: 767px)" srcset="https://raw.githubusercontent.com/brno01/brno01/output/proj-nomad-mobile-light.svg">
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/brno01/brno01/output/proj-nomad-desktop-dark.svg">
+  <img src="https://raw.githubusercontent.com/brno01/brno01/output/proj-nomad-desktop-light.svg" width="100%" alt="nomad: ajustes de um notebook com Bazzite. Stack: Python, Bash, Linux.">
+</picture>
+</a>
+<a href="https://github.com/brno01/.github">
+<picture>
+  <source media="(max-width: 767px) and (prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/brno01/brno01/output/proj-dot-github-mobile-dark.svg">
+  <source media="(max-width: 767px)" srcset="https://raw.githubusercontent.com/brno01/brno01/output/proj-dot-github-mobile-light.svg">
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/brno01/brno01/output/proj-dot-github-desktop-dark.svg">
+  <img src="https://raw.githubusercontent.com/brno01/brno01/output/proj-dot-github-desktop-light.svg" width="100%" alt=".github: workflows reutilizáveis de segurança, revisão e releases. Stack: GitHub Actions, Claude Code.">
+</picture>
+</a>
+</p>
 
-**Também construí (privados):**
+**Também construí (privados)**
+
 - Homelab como código: contêineres, stack de IA local, servidores de jogo, backups e os scripts que instalam e vigiam tudo.
-- App desktop modular em React + Tauri/Rust para ferramentas internas, com autenticação central e execução de integrações auditada.
+- App desktop modular em React e Tauri/Rust para ferramentas internas, com autenticação central e execução de integrações auditada.
 
-**Estudos:** [e-Fispq](https://github.com/brno01/e-Fispq) (API em NestJS), [estudo-rest-api-js](https://github.com/brno01/estudo-rest-api-js) e [app-estudo](https://github.com/brno01/app-estudo) (APIs REST em Express).
+**Estudos:** [e-Fispq](https://github.com/brno01/e-Fispq) (API em NestJS), [estudo-rest-api-js](https://github.com/brno01/estudo-rest-api-js) (API REST em Express), [app-estudo](https://github.com/brno01/app-estudo) (API REST em Express)
 
 ## Stack
 
 **Linguagens**<br>
-<img alt="Python" src="https://img.shields.io/badge/Python-3776AB?style=flat-square&logo=python&logoColor=white"> <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-3178C6?style=flat-square&logo=typescript&logoColor=white"> <img alt="JavaScript" src="https://img.shields.io/badge/JavaScript-F7DF1E?style=flat-square&logo=javascript&logoColor=black"> <img alt="Bash" src="https://img.shields.io/badge/Bash-4EAA25?style=flat-square&logo=gnubash&logoColor=white"> <img alt="Rust" src="https://img.shields.io/badge/Rust-000000?style=flat-square&logo=rust&logoColor=white">
+<kbd>Python</kbd> <kbd>TypeScript</kbd> <kbd>JavaScript</kbd> <kbd>Bash</kbd> <kbd>Rust</kbd>
 
 **Back-end**<br>
-<img alt="Node.js" src="https://img.shields.io/badge/Node.js-5FA04E?style=flat-square&logo=nodedotjs&logoColor=white"> <img alt="NestJS" src="https://img.shields.io/badge/NestJS-E0234E?style=flat-square&logo=nestjs&logoColor=white"> <img alt="Express" src="https://img.shields.io/badge/Express-000000?style=flat-square&logo=express&logoColor=white">
+<kbd>Node.js</kbd> <kbd>NestJS</kbd> <kbd>Express</kbd>
 
 **Infra e ferramentas**<br>
-<img alt="Linux" src="https://img.shields.io/badge/Linux-FCC624?style=flat-square&logo=linux&logoColor=black"> <img alt="Docker" src="https://img.shields.io/badge/Docker-2496ED?style=flat-square&logo=docker&logoColor=white"> <img alt="Podman" src="https://img.shields.io/badge/Podman-892CA0?style=flat-square&logo=podman&logoColor=white"> <img alt="Tailscale" src="https://img.shields.io/badge/Tailscale-242424?style=flat-square&logo=tailscale&logoColor=white"> <img alt="GitHub Actions" src="https://img.shields.io/badge/GitHub_Actions-2088FF?style=flat-square&logo=githubactions&logoColor=white"> <img alt="Git" src="https://img.shields.io/badge/Git-F05032?style=flat-square&logo=git&logoColor=white"> <img alt="Claude Code" src="https://img.shields.io/badge/Claude_Code-D97757?style=flat-square&logo=claude&logoColor=white">
+<kbd>Linux</kbd> <kbd>Docker</kbd> <kbd>Podman</kbd> <kbd>Tailscale</kbd> <kbd>GitHub Actions</kbd> <kbd>Git</kbd> <kbd>Claude Code</kbd>
+
+## Atividade
+
+<p>
+<picture>
+  <source media="(max-width: 767px) and (prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/brno01/brno01/output/activity-mobile-dark.svg">
+  <source media="(max-width: 767px)" srcset="https://raw.githubusercontent.com/brno01/brno01/output/activity-mobile-light.svg">
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/brno01/brno01/output/activity-desktop-dark.svg">
+  <img src="https://raw.githubusercontent.com/brno01/brno01/output/activity-desktop-light.svg" width="100%" alt="Gráfico de atividade no GitHub nas últimas 26 semanas.">
+</picture>
+</p>
 
 <details>
 <summary><b>English</b></summary>
 
 ### Bruno Oliveira
 
-Back-end developer focused on **automation and infrastructure**: Linux, homelab as code, CI/CD and integrations in Python and TypeScript.
+Back-end developer focused on automation and infrastructure: Linux, homelab as code, CI/CD and integrations in Python and TypeScript.
 
 I work in tier-2 technical support and I am moving into software development. Off the clock I run a homelab the way I would run production: everything versioned, installed by script, tested, security-scanned on every push and reviewed before merging. I enjoy problems where code meets the system: servers, networks, automation and the tools that make all of it easy to operate.
 
@@ -58,6 +114,4 @@ The projects above are the best place to start. Each repository has its own READ
 
 </details>
 
-<p align="center">
-  <img alt="Contribuições" src="https://raw.githubusercontent.com/brno01/brno01/output/github-contribution-grid-snake.svg">
-</p>
+<p><sub>Este README é gerado: a arte e os números vêm de <a href="tools/build.py">tools/build.py</a> e são refeitos todo dia por uma GitHub Action.</sub></p>
