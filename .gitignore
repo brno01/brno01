@@ -1,0 +1,6 @@
+dist/
+tools/fonts/.cache/
+__pycache__/
+.pytest_cache/
+.venv/
+/snapshot.json

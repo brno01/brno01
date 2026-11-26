@@ -1,0 +1,201 @@
+{
+  "name": "Bruno Oliveira",
+  "tagline": "back-end · automação · infraestrutura",
+  "tagline_parts": [
+    "back-end",
+    "automação",
+    "infraestrutura"
+  ],
+  "lede": "Desenvolvedor back-end com foco em automação e infraestrutura: Linux, homelab como código, CI/CD e integrações em Python e TypeScript.",
+  "contacts": [
+    {
+      "label": "LinkedIn",
+      "url": "https://www.linkedin.com/in/brno01oliveira/"
+    },
+    {
+      "label": "E-mail",
+      "url": "mailto:contato.bruno0dev@gmail.com"
+    },
+    {
+      "label": "Discord",
+      "url": "https://discord.gg/nQEaSHMcnp"
+    }
+  ],
+  "about": [
+    "Trabalho com suporte técnico N2 e estou migrando para desenvolvimento. Fora do expediente, mantenho um homelab tratado como produção: tudo versionado, instalado por script, com testes, CI de segurança em cada push e revisão antes do merge.",
+    "Gosto de problemas que juntam código e sistema: servidores, redes, automações e as ferramentas que deixam tudo isso fácil de operar."
+  ],
+  "projects": [
+    {
+      "slug": "kindle-monitor",
+      "url": "https://github.com/brno01/kindle-monitor",
+      "title": "kindle-monitor",
+      "kind": "hardware",
+      "desc": "Kindle com jailbreak como monitor e-ink do homelab: CPU, RAM, GPU, discos e serviços.",
+      "desc_short": "Kindle como painel e-ink do homelab",
+      "stack": [
+        "Python",
+        "Shell",
+        "FBInk"
+      ],
+      "alt": "kindle-monitor: Kindle como monitor e-ink do homelab. Stack: Python, Shell, FBInk.",
+      "repo": "kindle-monitor"
+    },
+    {
+      "slug": "sinapses",
+      "url": "https://github.com/brno01/sinapses",
+      "title": "sinapses",
+      "kind": "biblioteca",
+      "desc": "Fios animados em canvas que ligam nós de uma interface e mostram o estado de cada ligação.",
+      "desc_short": "Fios animados entre nós de interface",
+      "stack": [
+        "TypeScript",
+        "React",
+        "Canvas"
+      ],
+      "alt": "sinapses: fios animados ligando nós de uma interface. Stack: TypeScript, React, Canvas.",
+      "repo": "sinapses"
+    },
+    {
+      "slug": "tailnet-dns-failover",
+      "url": "https://github.com/brno01/tailnet-dns-failover",
+      "title": "tailnet-dns-failover",
+      "kind": "rede",
+      "desc": "Failover de DNS: Pi-hole enquanto o host responde, resolvedor público quando ele cai.",
+      "desc_short": "Failover de DNS: Pi-hole ou resolvedor público",
+      "stack": [
+        "Shell",
+        "GitHub Actions",
+        "Tailscale"
+      ],
+      "alt": "tailnet-dns-failover: DNS que troca do Pi-hole para um resolvedor público. Stack: Shell, GitHub Actions, Tailscale.",
+      "repo": "tailnet-dns-failover"
+    },
+    {
+      "slug": "galaxy-s10",
+      "url": "https://github.com/brno01/galaxy-s10",
+      "title": "galaxy-s10",
+      "kind": "nó remoto",
+      "desc": "Celular sem tela como nó do homelab, com três caminhos de acesso remoto redundantes.",
+      "desc_short": "Celular sem tela como nó do homelab",
+      "stack": [
+        "Python",
+        "adb",
+        "Termux"
+      ],
+      "alt": "galaxy-s10: celular sem tela como nó do homelab, com três acessos remotos. Stack: Python, adb, Termux.",
+      "repo": "galaxy-s10"
+    },
+    {
+      "slug": "nomad",
+      "url": "https://github.com/brno01/nomad",
+      "title": "nomad",
+      "kind": "notebook",
+      "desc": "Notebook com Bazzite: failover de DNS, exportador para o Obsidian e streaming de jogos.",
+      "desc_short": "Ajustes de um notebook com Bazzite",
+      "stack": [
+        "Python",
+        "Bash",
+        "Linux"
+      ],
+      "alt": "nomad: ajustes de um notebook com Bazzite. Stack: Python, Bash, Linux.",
+      "repo": "nomad"
+    },
+    {
+      "slug": "dot-github",
+      "url": "https://github.com/brno01/.github",
+      "title": ".github",
+      "kind": "CI compartilhada",
+      "desc": "Workflows reutilizáveis de segurança, revisão com Claude e releases para os repositórios.",
+      "desc_short": "Workflows reutilizáveis para os repos",
+      "stack": [
+        "GitHub Actions",
+        "Claude Code"
+      ],
+      "alt": ".github: workflows reutilizáveis de segurança, revisão e releases. Stack: GitHub Actions, Claude Code.",
+      "repo": ".github"
+    }
+  ],
+  "also_private": [
+    "Homelab como código: contêineres, stack de IA local, servidores de jogo, backups e os scripts que instalam e vigiam tudo.",
+    "App desktop modular em React e Tauri/Rust para ferramentas internas, com autenticação central e execução de integrações auditada."
+  ],
+  "studies": [
+    {
+      "title": "e-Fispq",
+      "url": "https://github.com/brno01/e-Fispq",
+      "note": "API em NestJS"
+    },
+    {
+      "title": "estudo-rest-api-js",
+      "url": "https://github.com/brno01/estudo-rest-api-js",
+      "note": "API REST em Express"
+    },
+    {
+      "title": "app-estudo",
+      "url": "https://github.com/brno01/app-estudo",
+      "note": "API REST em Express"
+    }
+  ],
+  "stack": [
+    {
+      "group": "Linguagens",
+      "items": [
+        "Python",
+        "TypeScript",
+        "JavaScript",
+        "Bash",
+        "Rust"
+      ]
+    },
+    {
+      "group": "Back-end",
+      "items": [
+        "Node.js",
+        "NestJS",
+        "Express"
+      ]
+    },
+    {
+      "group": "Infra e ferramentas",
+      "items": [
+        "Linux",
+        "Docker",
+        "Podman",
+        "Tailscale",
+        "GitHub Actions",
+        "Git",
+        "Claude Code"
+      ]
+    }
+  ],
+  "labels": {
+    "updated": "atualizado",
+    "about": "Sobre",
+    "projects": "Projetos",
+    "stack": "Stack",
+    "activity_heading": "Atividade",
+    "also_private": "Também construí (privados)",
+    "studies": "Estudos",
+    "hub": "brno01",
+    "active_line": "{n} de 6 projetos com push nos últimos 14 dias",
+    "push": "push",
+    "contrib_line": "contribuições em 12 meses"
+  },
+  "alt": {
+    "hero": "Bruno Oliveira, desenvolvedor back-end em automação e infraestrutura. Arte de abertura do perfil.",
+    "activity": "Gráfico de atividade no GitHub nas últimas 26 semanas."
+  },
+  "english": {
+    "summary": "English",
+    "heading": "Bruno Oliveira",
+    "lede": "Back-end developer focused on automation and infrastructure: Linux, homelab as code, CI/CD and integrations in Python and TypeScript.",
+    "about": [
+      "I work in tier-2 technical support and I am moving into software development. Off the clock I run a homelab the way I would run production: everything versioned, installed by script, tested, security-scanned on every push and reviewed before merging. I enjoy problems where code meets the system: servers, networks, automation and the tools that make all of it easy to operate."
+    ],
+    "closing": "The projects above are the best place to start. Each repository has its own README, CI and security scan."
+  },
+  "login": "brno01",
+  "assets_base": "https://raw.githubusercontent.com/brno01/brno01/output/",
+  "footer": "Este README é gerado: a arte e os números vêm de tools/build.py e são refeitos todo dia por uma GitHub Action."
+}
