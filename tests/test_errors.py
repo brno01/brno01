@@ -72,10 +72,9 @@ def test_weeks_26_too_short(build, snapshot_data, tmp_path, capsys, n):
     _assert_failed_cleanly(build, _write(tmp_path, snap), tmp_path, capsys)
 
 
-def test_content_projects_differ_from_hero_nodes(build, snapshot_data, content, tmp_path, capsys, monkeypatch):
+def test_content_projects_differ_from_drawn_icons(build, snapshot_data, content, tmp_path, capsys, monkeypatch):
     bad = json.loads(json.dumps(content))
-    extra = dict(bad["projects"][0], repo="alpha", slug="alpha")
-    bad["projects"][0] = extra
+    bad["projects"][0] = dict(bad["projects"][0], repo="alpha", slug="alpha")
     snap = _broken(snapshot_data)
     snap["repos"]["alpha"] = {"pushed_at": "2026-11-20"}
     monkeypatch.setattr(build, "load_content", lambda *a: bad)
@@ -109,7 +108,7 @@ def test_existing_out_stays_intact_on_failure(build, snapshot_path, snapshot_dat
     code, err = _run(build, path, out, capsys)
     assert code == 1 and err.strip() and "Traceback" not in err
     assert _digest(out) == before
-    assert len(list(out.iterdir())) == 32
+    assert len(list(out.iterdir())) == 58
     assert not [p for p in tmp_path.iterdir() if p.name.startswith(".build-")]
 
 

@@ -26,11 +26,9 @@ REDUCED_MOTION_CSS = "@media (prefers-reduced-motion: reduce){*{animation:none!i
 
 # logical name -> (file, variation axes or None, id letter). The letter keeps glyph ids stable.
 _REGISTRY: dict[str, tuple[str, dict[str, float] | None, str]] = {
-    "bricolage-400": ("BricolageGrotesque-Variable.ttf", {"wght": 400, "wdth": 100}, "e"),
-    "bricolage-600": ("BricolageGrotesque-Variable.ttf", {"wght": 600, "wdth": 100}, "f"),
-    "bricolage-800": ("BricolageGrotesque-Variable.ttf", {"wght": 800, "wdth": 100}, "g"),
-    "plexmono-400": ("IBMPlexMono-Regular.ttf", None, "l"),
-    "plexmono-500": ("IBMPlexMono-Medium.ttf", None, "m"),
+    "departure": ("DepartureMono-Regular.otf", None, "h"),
+    "literata-400i": ("Literata-Italic-Variable.ttf", {"wght": 400}, "j"),
+    "literata-600": ("Literata-Variable.ttf", {"wght": 600}, "k"),
 }
 
 
@@ -172,13 +170,6 @@ class Font:
         self._cmap = tt.getBestCmap()
         self._hmtx = tt["hmtx"].metrics
         self._kern = _Kern(tt)
-        self._cap = None
-
-    def cap_height(self, size: float) -> float:
-        if self._cap is None:
-            v = getattr(self._tt["OS/2"], "sCapHeight", 0)
-            self._cap = v / self.upm
-        return self._cap * size
 
     def glyph_name(self, ch: str) -> str:
         g = self._cmap.get(ord(ch))
@@ -212,17 +203,6 @@ class Font:
         if cur:
             lines.append(cur)
         return lines
-
-    def fit(self, texto: str, size: float, max_width: float, tracking: float = 0.0) -> str:
-        """The text itself if it fits, else the longest prefix plus an ellipsis that fits."""
-        if self.measure(texto, size, tracking) <= max_width:
-            return texto
-        s = texto
-        while s:
-            s = s[:-1].rstrip()
-            if self.measure(s + "…", size, tracking) <= max_width:
-                return s + "…"
-        return "…"
 
     def glyph_id(self, gname: str) -> str:
         """Short deterministic id for a glyph outline in <defs>: font letter + glyph index in base 36."""
@@ -342,7 +322,7 @@ def _load(name: str) -> TTFont:
 
 
 def font(nome: str) -> Font:
-    """Logical font by name (bricolage-400/600/800, plexmono-400/500)."""
+    """Logical font by name (departure, literata-400i, literata-600)."""
     if nome not in _REGISTRY:
         raise KeyError(f"fonte desconhecida {nome!r}; opcoes: {', '.join(sorted(_REGISTRY))}")
     if nome not in _font_cache:
