@@ -77,6 +77,38 @@
     "discord": {
       "hex": "5865F2",
       "letters": null
+    },
+    "postgresql": {
+      "hex": "4169E1",
+      "letters": null
+    },
+    "mysql": {
+      "hex": "4479A1",
+      "letters": null
+    },
+    "react": {
+      "hex": "61DAFB",
+      "letters": null
+    },
+    "vite": {
+      "hex": "9135FF",
+      "letters": null
+    },
+    "tauri": {
+      "hex": "24C8D8",
+      "letters": null
+    },
+    "pytest": {
+      "hex": "0A9EDC",
+      "letters": null
+    },
+    "vitest": {
+      "hex": "00FF74",
+      "letters": null
+    },
+    "jest": {
+      "hex": "C21325",
+      "letters": null
     }
   }
 }

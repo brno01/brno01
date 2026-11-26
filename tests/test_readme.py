@@ -91,8 +91,8 @@ def _chip_imgs(scan):
 
 
 def test_every_img_has_alt_and_a_known_size(scan):
-    assert len(scan.imgs) == 7 + 4 + 15  # hero + six projects, one icon per contact and per stack chip
-    assert len(_art_imgs(scan)) == 7 and len(_chip_imgs(scan)) == 19
+    assert len(scan.imgs) == 7 + 4 + 23  # hero + six projects, one icon per contact and per stack chip
+    assert len(_art_imgs(scan)) == 7 and len(_chip_imgs(scan)) == 27
     for img in _art_imgs(scan):
         assert img.get("alt", "").strip()
     for img in _chip_imgs(scan):
@@ -101,10 +101,10 @@ def test_every_img_has_alt_and_a_known_size(scan):
 
 
 def test_picture_structure(scan):
-    assert len(scan.pictures) == len(scan.imgs) == 26
+    assert len(scan.pictures) == len(scan.imgs) == 34
     art = [p for p in scan.pictures if len([x for x in p if isinstance(x, dict)]) == 3]
     chips = [p for p in scan.pictures if len([x for x in p if isinstance(x, dict)]) == 1]
-    assert len(art) == 7 and len(chips) == 19
+    assert len(art) == 7 and len(chips) == 27
     for pic in art:
         sources = [x for x in pic if isinstance(x, dict)]
         assert [s["media"] for s in sources] == [
@@ -133,7 +133,7 @@ def test_referenced_files_equal_generated_files(scan, content, assets):
     base = content["assets_base"]
     referenced = {s[len(base):] for s in scan.srcs}
     assert referenced == set(assets)
-    assert len(referenced) == 66
+    assert len(referenced) == 82
 
 
 def test_chip_markup_per_item(readme, content):
@@ -146,8 +146,8 @@ def test_chip_markup_per_item(readme, content):
                     f'<img src="{base}/icon-{it["icon"]}-light.svg" width="11" height="11" alt="" align="top"></picture> '
                     f'{it["name"]}</kbd>')
             assert chip in readme, it["name"]
-    assert n == 15
-    assert readme.count("<kbd><picture>") == 15 + len(content["contacts"])
+    assert n == 23
+    assert readme.count("<kbd><picture>") == 23 + len(content["contacts"])
 
 
 def test_contacts_are_kbd_links_with_an_icon_and_no_arrow(readme, content):
@@ -165,8 +165,9 @@ def test_contacts_are_kbd_links_with_an_icon_and_no_arrow(readme, content):
 def test_section_order_and_no_activity_section(readme, content):
     lab = content["labels"]
     marks = [readme.index(m) for m in (
-        "<picture>", content["lede"], f'## {lab["about"]}', f'## {lab["projects"]}', f'**{lab["also_private"]}**',
-        f'**{lab["studies"]}:**', f'## {lab["stack"]}', "<details>", "<sub>")]
+        "<picture>", content["lede"], f'## {lab["about"]}', f'## {lab["projects"]}', f'<b>{lab["projects_details"]}</b>',
+        f'**{lab["also_private"]}**', f'**{lab["studies"]}:**', f'## {lab["stack"]}',
+        f'<b>{content["english"]["summary"]}</b>', "<sub>")]
     assert marks == sorted(marks)
     assert readme.index("<picture>") < readme.index(content["lede"])
     assert "Atividade" not in readme and "activity" not in readme.lower()
@@ -186,10 +187,11 @@ def test_hero_picture_is_in_a_paragraph(readme):
 def test_english_block_inside_details(readme, content, scan):
     en = content["english"]
     assert scan.details_depth == 0
-    start, end = readme.index("<details>"), readme.index("</details>")
+    start = readme.index(f'<details>\n<summary><b>{en["summary"]}</b>')
+    end = readme.index("</details>", start)
     for needle in (en["summary"], en["heading"], en["lede"], en["closing"]):
         assert start < readme.index(needle, start) < end
-    assert readme.count("<details>") == 1
+    assert readme.count("<details>") == 2  # project details and English
     assert "<summary><b>" in readme[start:end]
     # no English text leaks outside the block
     assert en["lede"] not in readme[:start] + readme[end:]
@@ -205,3 +207,18 @@ def test_content_is_html_escaped(build, content):
 def test_project_links_wrap_pictures(readme, content):
     for p in content["projects"]:
         assert f'<a href="{p["url"]}">' in readme
+
+
+def test_project_details_are_one_collapsed_list(readme, content):
+    lab = content["labels"]
+    start = readme.index(f'<details>\n<summary><b>{lab["projects_details"]}</b></summary>')
+    block = readme[start:readme.index("</details>", start)]
+    assert readme.index("proj-dot-github") < start < readme.index(f'**{lab["also_private"]}**')
+    for p in content["projects"]:
+        assert f'- **[{p["title"]}]({p["url"]})**: {p["details"]}' in block
+        assert len(p["details"]) > len(p["desc"])
+
+
+def test_readme_names_no_dns_server_or_os_of_a_machine(readme):
+    low = readme.lower()
+    assert "pi-hole" not in low and "bazzite" not in low

@@ -1,7 +1,7 @@
 # Gerador do README de perfil
 
 Este diretório gera o `README.md` do perfil e a arte em SVG que ele mostra. Nenhum SVG fica
-versionado: uma GitHub Action refaz os 66 arquivos todo dia e os publica na branch `output`,
+versionado: uma GitHub Action refaz os 82 arquivos todo dia e os publica na branch `output`,
 de onde o README os carrega. Se a Action falhar, a `output` continua com a arte do dia anterior.
 
 ## Arquivos
@@ -12,17 +12,17 @@ de onde o README os carrega. Se a Action falhar, a `output` continua com a arte 
 | `build.py` | gera os SVG (`assets`) e o `README.md` (`readme`) |
 | `snapshot.py` | busca no GitHub os dados do dia (contribuições e pushes) |
 | `svgkit.py` | kit de SVG: mede fontes e desenha o texto em contornos |
-| `icons/` | os 18 SVG originais do simple-icons (CC0), o `linkedin.svg` desenhado aqui, `LICENSE.md` e `icons.json` (cor da marca de cada ícone) |
+| `icons/` | os 26 SVG originais do simple-icons (CC0), o `linkedin.svg` desenhado aqui, `LICENSE.md` e `icons.json` (cor da marca de cada ícone) |
 | `requirements.in`, `requirements.txt` | dependências (`fonttools`, `pytest`), a segunda com hashes |
 | `fonts/` | fontes usadas na arte, com as licenças em `fonts/licenses/` |
 | `../tests/` | testes e dados fixos (`fixtures/snapshot.json`) |
 
-## O que é gerado (66 arquivos, todos na raiz de `--out`)
+## O que é gerado (82 arquivos, todos na raiz de `--out`)
 
 - `hero-{desktop,mobile}-{dark,light}.svg` (4): a tela e-ink com nome, indicadores e o gráfico de 26 semanas.
 - `proj-<slug>-{desktop,mobile}-{dark,light}.svg` (24): uma "página" por projeto, com ícone em pixels,
   título, data do último push, descrição e stack.
-- `icon-<icone>-{light,dark}.svg` (38): os 19 ícones dos chips (4 contatos e 15 da stack) na cor da marca, ajustada para ter
+- `icon-<icone>-{light,dark}.svg` (54): os 27 ícones dos chips (4 contatos e 23 da stack) na cor da marca, ajustada para ter
   contraste de pelo menos 3,5:1 contra o fundo do `<kbd>` do GitHub (TypeScript e JavaScript mantêm a
   cor da marca com as letras sobre um quadrado).
 
@@ -80,7 +80,7 @@ gerador para com erro e não escreve nada.
   publica na branch `output` com git puro, num repositório novo de um commit só, com
   `push --force`.
 
-Antes de publicar, o job confere só com shell que o artefato tem exatamente 66 arquivos
+Antes de publicar, o job confere só com shell que o artefato tem exatamente 82 arquivos
 `.svg` comuns, na raiz, com nome `[a-z0-9][a-z0-9-]*.svg` (pasta `.git`, link simbólico,
 subpasta ou outro tipo de arquivo derrubam o job).
 
@@ -108,7 +108,7 @@ andar, reative o workflow em Actions.
    `uv pip compile --generate-hashes --python-version 3.13 tools/requirements.in -o tools/requirements.txt`;
 3. ajuste o `fonttools==` do cabeçalho de `build.py` (o `uv run` lê dali). O teste
    `test_fonttools_pin_is_the_same_everywhere` falha se os três não baterem;
-4. rode os testes e confira que `build.py assets` com a fixture gera os mesmos 66 arquivos (ou que
+4. rode os testes e confira que `build.py assets` com a fixture gera os mesmos 82 arquivos (ou que
    a diferença é esperada).
 
 As Actions são fixadas por SHA; o Dependabot propõe as atualizações.

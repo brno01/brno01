@@ -40,7 +40,8 @@
         "FBInk"
       ],
       "alt": "kindle-monitor: Kindle como monitor e-ink do homelab. Stack: Python, Shell, FBInk.",
-      "repo": "kindle-monitor"
+      "repo": "kindle-monitor",
+      "details": "Um Kindle Paperwhite 5 com jailbreak mostra em e-ink CPU, RAM, GPU, temperaturas, discos e o estado dos serviços do homelab. O servidor coleta os dados e desenha a tela; o Kindle só busca a imagem pela rede privada e a exibe, e volta sozinho depois de reiniciar. O pacote do aparelho sai como release a cada versão."
     },
     {
       "slug": "sinapses",
@@ -54,21 +55,23 @@
         "Canvas"
       ],
       "alt": "sinapses: fios animados ligando nós de uma interface. Stack: TypeScript, React, Canvas.",
-      "repo": "sinapses"
+      "repo": "sinapses",
+      "details": "Biblioteca em TypeScript que desenha, em canvas, feixes de fios com física própria entre os nós de uma interface. O movimento mostra o estado de cada ligação: repouso, em uso, testando, atualizando, anomalia, quebrada, bloqueada, ligando e desligando. Roda num Web Worker com OffscreenCanvas quando o navegador permite, tem componente React, respeita a preferência por menos movimento e é publicada como pacote a cada versão."
     },
     {
       "slug": "tailnet-dns-failover",
       "url": "https://github.com/brno01/tailnet-dns-failover",
       "title": "tailnet-dns-failover",
-      "desc": "Failover de DNS: Pi-hole enquanto o host responde, resolvedor público quando ele cai.",
-      "desc_short": "Failover de DNS: Pi-hole ou resolvedor público",
+      "desc": "Failover de DNS da tailnet: troca para um resolvedor público quando o DNS próprio cai.",
+      "desc_short": "Failover de DNS da tailnet pelo GitHub Actions",
       "stack": [
         "Shell",
         "GitHub Actions",
         "Tailscale"
       ],
-      "alt": "tailnet-dns-failover: DNS que troca do Pi-hole para um resolvedor público. Stack: Shell, GitHub Actions, Tailscale.",
-      "repo": "tailnet-dns-failover"
+      "alt": "tailnet-dns-failover: failover de DNS da tailnet para um resolvedor público. Stack: Shell, GitHub Actions, Tailscale.",
+      "repo": "tailnet-dns-failover",
+      "details": "Workflow agendado no GitHub Actions que, a cada 5 minutos, entra na tailnet do Tailscale como nó efêmero e testa o servidor de DNS próprio. Se ele não responde, troca os nameservers da tailnet para um resolvedor público e volta quando o serviço se recupera; um resultado inconclusivo não muda nada. Como roda fora de casa, continua funcionando quando a rede local inteira cai. A credencial é um cliente OAuth com os escopos mínimos."
     },
     {
       "slug": "galaxy-s10",
@@ -82,21 +85,23 @@
         "Termux"
       ],
       "alt": "galaxy-s10: celular sem tela como nó do homelab, com três acessos remotos. Stack: Python, adb, Termux.",
-      "repo": "galaxy-s10"
+      "repo": "galaxy-s10",
+      "details": "Um Galaxy S10 com a tela quebrada vira um nó do homelab, ligado por USB ao servidor. Três caminhos independentes dão tela e toque remotos: adb por USB através de um túnel SSH, adb sem fio e VNC pela tailnet. Um guardião em Python, sem privilégios de root, confere o aparelho a cada 30 segundos e só corrige o que saiu do lugar. O celular também serve para testar apps Android a distância."
     },
     {
       "slug": "nomad",
       "url": "https://github.com/brno01/nomad",
       "title": "nomad",
-      "desc": "Notebook com Bazzite: failover de DNS, exportador para o Obsidian e streaming de jogos.",
-      "desc_short": "Ajustes de um notebook com Bazzite",
+      "desc": "Automações do notebook de uso diário: ajustes do sistema, documentação no Obsidian e jogos.",
+      "desc_short": "Automações do notebook de uso diário",
       "stack": [
         "Python",
         "Bash",
         "Linux"
       ],
-      "alt": "nomad: ajustes de um notebook com Bazzite. Stack: Python, Bash, Linux.",
-      "repo": "nomad"
+      "alt": "nomad: automações do notebook de uso diário. Stack: Python, Bash, Linux.",
+      "repo": "nomad",
+      "details": "Os scripts que configuram e mantêm o notebook de uso diário, versionados: instaladores idempotentes com modo de simulação e desfazer, um exportador que documenta a máquina no Obsidian e um vigia que mantém o cofre organizado, e o perfil de streaming de jogos para o celular. Testes com bats e pytest e a mesma varredura de segurança dos outros repositórios."
     },
     {
       "slug": "dot-github",
@@ -109,7 +114,8 @@
         "Claude Code"
       ],
       "alt": ".github: workflows reutilizáveis de segurança, revisão e releases. Stack: GitHub Actions, Claude Code.",
-      "repo": ".github"
+      "repo": ".github",
+      "details": "Configuração compartilhada da conta. Um workflow de segurança roda gitleaks, osv-scanner, semgrep, shellcheck, actionlint e zizmor e abre uma issue quando a branch principal falha; outro traz a revisão sob demanda com o Claude, acionada só pelo dono; um terceiro cria a release de cada tag. Cada repositório copia um arquivo pequeno e usa a versão v1; as ferramentas são baixadas em versões fixas e conferidas por SHA-256."
     }
   ],
   "also_private": [
@@ -173,6 +179,48 @@
         {
           "name": "Express",
           "icon": "express"
+        },
+        {
+          "name": "PostgreSQL",
+          "icon": "postgresql"
+        },
+        {
+          "name": "MySQL",
+          "icon": "mysql"
+        }
+      ]
+    },
+    {
+      "group": "Front-end e desktop",
+      "items": [
+        {
+          "name": "React",
+          "icon": "react"
+        },
+        {
+          "name": "Vite",
+          "icon": "vite"
+        },
+        {
+          "name": "Tauri",
+          "icon": "tauri"
+        }
+      ]
+    },
+    {
+      "group": "Testes",
+      "items": [
+        {
+          "name": "pytest",
+          "icon": "pytest"
+        },
+        {
+          "name": "Vitest",
+          "icon": "vitest"
+        },
+        {
+          "name": "Jest",
+          "icon": "jest"
         }
       ]
     },
@@ -221,7 +269,8 @@
     "contrib_line": "contribuições em 12 meses",
     "public_repos": "projetos públicos",
     "last_push": "último push",
-    "most_recent": "mais recente"
+    "most_recent": "mais recente",
+    "projects_details": "Detalhes dos projetos"
   },
   "alt": {
     "hero": "Bruno Oliveira, desenvolvedor back-end em automação e infraestrutura. Arte de abertura do perfil."

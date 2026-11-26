@@ -108,7 +108,7 @@ def test_existing_out_stays_intact_on_failure(build, snapshot_path, snapshot_dat
     code, err = _run(build, path, out, capsys)
     assert code == 1 and err.strip() and "Traceback" not in err
     assert _digest(out) == before
-    assert len(list(out.iterdir())) == 66
+    assert len(list(out.iterdir())) == 82
     assert not [p for p in tmp_path.iterdir() if p.name.startswith(".build-")]
 
 

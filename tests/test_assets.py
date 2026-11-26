@@ -29,9 +29,9 @@ def test_expected_file_set(assets, content):
     art = {f"{k}-{d}-{t}.svg" for k in ["hero"] + [f"proj-{s}" for s in slugs]
            for d in ("desktop", "mobile") for t in ("dark", "light")}
     stack = {f"icon-{i}-{t}.svg" for i in icons for t in ("light", "dark")}
-    assert len(slugs) == 6 and len(icons) == 19
-    assert len(art) == 28 and len(stack) == 38
-    assert set(assets) == art | stack and len(assets) == 66
+    assert len(slugs) == 6 and len(icons) == 27
+    assert len(art) == 28 and len(stack) == 54
+    assert set(assets) == art | stack and len(assets) == 82
     assert not any(n.startswith("activity-") for n in assets)
 
 
@@ -96,7 +96,7 @@ def test_art_has_role_img_and_label(assets, content):
 
 def test_icons_are_decorative(assets):
     icons = _icons(assets)
-    assert len(icons) == 38
+    assert len(icons) == 54
     for name, text in icons.items():
         root = ET.fromstring(text)
         assert root.get("aria-hidden") == "true", name
