@@ -1,5 +1,5 @@
 {
-  "source": "simple-icons 16.37.0",
+  "source": "simple-icons 16.37.0; linkedin.svg is an original drawing, CC0 like the rest",
   "license": "CC0-1.0",
   "icons": {
     "python": {
@@ -60,6 +60,22 @@
     },
     "claude": {
       "hex": "D97757",
+      "letters": null
+    },
+    "linkedin": {
+      "hex": "0A66C2",
+      "letters": null
+    },
+    "github": {
+      "hex": "181717",
+      "letters": null
+    },
+    "gmail": {
+      "hex": "EA4335",
+      "letters": null
+    },
+    "discord": {
+      "hex": "5865F2",
       "letters": null
     }
   }

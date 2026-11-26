@@ -91,8 +91,8 @@ def _chip_imgs(scan):
 
 
 def test_every_img_has_alt_and_a_known_size(scan):
-    assert len(scan.imgs) == 7 + 15  # hero + six projects, and one icon per stack chip
-    assert len(_art_imgs(scan)) == 7 and len(_chip_imgs(scan)) == 15
+    assert len(scan.imgs) == 7 + 4 + 15  # hero + six projects, one icon per contact and per stack chip
+    assert len(_art_imgs(scan)) == 7 and len(_chip_imgs(scan)) == 19
     for img in _art_imgs(scan):
         assert img.get("alt", "").strip()
     for img in _chip_imgs(scan):
@@ -101,10 +101,10 @@ def test_every_img_has_alt_and_a_known_size(scan):
 
 
 def test_picture_structure(scan):
-    assert len(scan.pictures) == len(scan.imgs) == 22
+    assert len(scan.pictures) == len(scan.imgs) == 26
     art = [p for p in scan.pictures if len([x for x in p if isinstance(x, dict)]) == 3]
     chips = [p for p in scan.pictures if len([x for x in p if isinstance(x, dict)]) == 1]
-    assert len(art) == 7 and len(chips) == 15
+    assert len(art) == 7 and len(chips) == 19
     for pic in art:
         sources = [x for x in pic if isinstance(x, dict)]
         assert [s["media"] for s in sources] == [
@@ -133,7 +133,7 @@ def test_referenced_files_equal_generated_files(scan, content, assets):
     base = content["assets_base"]
     referenced = {s[len(base):] for s in scan.srcs}
     assert referenced == set(assets)
-    assert len(referenced) == 58
+    assert len(referenced) == 66
 
 
 def test_chip_markup_per_item(readme, content):
@@ -142,18 +142,24 @@ def test_chip_markup_per_item(readme, content):
     for gr in content["stack"]:
         for it in gr["items"]:
             n += 1
-            chip = (f'<kbd><picture><source media="(prefers-color-scheme: dark)" srcset="{base}/stack-{it["icon"]}-dark.svg">'
-                    f'<img src="{base}/stack-{it["icon"]}-light.svg" width="11" height="11" alt="" align="top"></picture> '
+            chip = (f'<kbd><picture><source media="(prefers-color-scheme: dark)" srcset="{base}/icon-{it["icon"]}-dark.svg">'
+                    f'<img src="{base}/icon-{it["icon"]}-light.svg" width="11" height="11" alt="" align="top"></picture> '
                     f'{it["name"]}</kbd>')
             assert chip in readme, it["name"]
     assert n == 15
-    assert readme.count("<kbd><picture>") == 15
+    assert readme.count("<kbd><picture>") == 15 + len(content["contacts"])
 
 
-def test_contacts_are_kbd_links_without_arrow(readme, content):
+def test_contacts_are_kbd_links_with_an_icon_and_no_arrow(readme, content):
     assert "↗" not in readme
+    base = content["assets_base"].rstrip("/")
+    labels = [c["label"] for c in content["contacts"]]
+    assert labels == ["LinkedIn", "Repositórios", "E-mail", "Discord"]
     for c in content["contacts"]:
-        assert f'<a href="{c["url"]}"><kbd>{c["label"]}</kbd></a>' in readme
+        chip = (f'<a href="{c["url"]}"><kbd><picture><source media="(prefers-color-scheme: dark)" '
+                f'srcset="{base}/icon-{c["icon"]}-dark.svg"><img src="{base}/icon-{c["icon"]}-light.svg" '
+                f'width="11" height="11" alt="" align="top"></picture> {c["label"]}</kbd></a>')
+        assert chip in readme, c["label"]
 
 
 def test_section_order_and_no_activity_section(readme, content):

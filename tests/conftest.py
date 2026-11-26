@@ -1,4 +1,4 @@
-"""Shared fixtures: modules under test and the 58 SVG files generated once per session."""
+"""Shared fixtures: modules under test and the 66 SVG files generated once per session."""
 import importlib.util
 import json
 import sys

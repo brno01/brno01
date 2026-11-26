@@ -4,15 +4,23 @@
   "contacts": [
     {
       "label": "LinkedIn",
-      "url": "https://www.linkedin.com/in/brno01oliveira/"
+      "url": "https://www.linkedin.com/in/brno01oliveira/",
+      "icon": "linkedin"
+    },
+    {
+      "label": "Repositórios",
+      "url": "https://github.com/brno01?tab=repositories",
+      "icon": "github"
     },
     {
       "label": "E-mail",
-      "url": "mailto:contato.bruno0dev@gmail.com"
+      "url": "mailto:contato.bruno0dev@gmail.com",
+      "icon": "gmail"
     },
     {
       "label": "Discord",
-      "url": "https://discord.gg/nQEaSHMcnp"
+      "url": "https://discord.gg/nQEaSHMcnp",
+      "icon": "discord"
     }
   ],
   "about": [

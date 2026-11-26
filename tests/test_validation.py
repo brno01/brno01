@@ -325,8 +325,8 @@ def _icons_copy(tmp_path):
 
 def test_every_stack_icon_has_a_source_and_metadata(build, content):
     meta = build.load_icon_meta()
-    slugs = build.stack_icon_slugs(content)
-    assert len(slugs) == 15
+    slugs = build.icon_slugs(content)
+    assert len(slugs) == 19
     for slug in slugs:
         assert slug in meta
         assert build.read_icon_path(slug)
@@ -349,7 +349,7 @@ def test_icon_with_metadata_but_no_svg_file(build, content, snapshot_data, tmp_p
     (icons / "python.svg").unlink()
     ctx = build.Ctx(snapshot_data, content)
     with pytest.raises(build.BuildError, match="python"):
-        build.stack_icons(ctx, icons)
+        build.emit_icons(ctx, icons)
 
 
 @pytest.mark.parametrize("svg,expect", [
@@ -384,7 +384,7 @@ def test_icons_json_is_validated(build, tmp_path, meta, expect):
 
 def test_icons_json_records_the_pinned_version():
     data = json.loads((ROOT / "tools" / "icons" / "icons.json").read_text(encoding="utf-8"))
-    assert data["source"] == "simple-icons 16.37.0"
+    assert data["source"].startswith("simple-icons 16.37.0;")
     assert (ROOT / "tools" / "icons" / "LICENSE.md").read_text(encoding="utf-8").startswith("# CC0")
 
 
@@ -404,9 +404,9 @@ def test_letter_icons_keep_the_brand_colour_on_a_backing_square(build):
     meta = build.load_icon_meta()
     d = build.read_icon_path("typescript")
     for theme in ("light", "dark"):
-        svg = build.stack_icon_svg("typescript", meta["typescript"], d, theme).decode()
+        svg = build.icon_svg("typescript", meta["typescript"], d, theme).decode()
         assert '<rect x="1" y="1" width="22" height="22" fill="#ffffff"/>' in svg and 'fill="#3178c6"' in svg
-    js = build.stack_icon_svg("javascript", meta["javascript"], build.read_icon_path("javascript"), "dark").decode()
+    js = build.icon_svg("javascript", meta["javascript"], build.read_icon_path("javascript"), "dark").decode()
     assert 'fill="#1a1a18"' in js and 'fill="#f7df1e"' in js
 
 
@@ -441,5 +441,5 @@ def test_readme_refuses_an_unsafe_icon_slug(build, content, icon):
 
 
 def test_generate_checks_the_number_of_files(build, content, snapshot_data, monkeypatch):
-    monkeypatch.setattr(build, "stack_icons", lambda ctx: None)
-    assert "esperava 58" in _gen_error(build, content, snapshot_data)
+    monkeypatch.setattr(build, "emit_icons", lambda ctx: None)
+    assert "esperava 66" in _gen_error(build, content, snapshot_data)
