@@ -150,6 +150,9 @@ def test_dark_and_light_differ_only_in_colors(assets, build):
         for th, text in (("dark", dark), ("light", light)):
             for key in keys:
                 text = text.replace(f'"{build.THEMES[th][key]}"', '"@theme"')
+            if kind == "hero":  # the screen swaps paper and ink between themes
+                bg, ink = build.SCREEN[th]
+                text = text.replace(f'"{bg}"', '"@screen-bg"').replace(f'"{ink}"', '"@screen-ink"')
             norm[th] = text
         assert norm["dark"] == norm["light"], name
 
@@ -197,8 +200,8 @@ def test_every_text_fill_in_svgs_meets_wcag_aa(assets, build):
     seen = 0
     for name, text in _art(assets).items():
         kind, _, theme = _split(name)
-        # text on the e-ink screen sits on paper in both themes; project pages sit on the GitHub page
-        bg = build.PAPER if kind == "hero" else GITHUB_BG[theme]
+        # text on the e-ink screen sits on the screen background; project pages sit on the GitHub page
+        bg = build.SCREEN[theme][0] if kind == "hero" else GITHUB_BG[theme]
         for g in ET.fromstring(text).iter(SVG_NS + "g"):
             if g.get("data-t") is not None:
                 seen += 1
@@ -209,8 +212,22 @@ def test_every_text_fill_in_svgs_meets_wcag_aa(assets, build):
 def test_hero_text_is_all_screen_ink(assets, build):
     for name, text in _art(assets).items():
         if name.startswith("hero-"):
+            theme = _split(name)[2]
             fills = {g.get("fill") for g in ET.fromstring(text).iter(SVG_NS + "g") if g.get("data-t") is not None}
-            assert fills == {build.INK}, name
+            assert fills == {build.SCREEN[theme][1]}, name
+
+
+@pytest.mark.parametrize("theme,page", [("dark", "#0d1117"), ("light", "#ffffff")])
+def test_screen_is_the_opposite_of_the_page(build, theme, page):
+    """Paper on the dark page, an inverted (dark mode) screen on the light page."""
+    bg, ink = build.SCREEN[theme]
+    assert {bg, ink} == {build.PAPER, build.INK}
+    assert contrast(bg, page) > contrast(ink, page)  # the screen background stands apart from the page
+
+
+def test_inverted_screen_stands_apart_from_its_frame(build):
+    # the dark screen must not melt into the light-theme frame
+    assert contrast(build.SCREEN["light"][0], build.THEMES["light"]["body"]) >= 1.5
 
 
 def test_stack_icons_meet_3_5_to_1(assets, build):

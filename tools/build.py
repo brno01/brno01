@@ -34,11 +34,13 @@ README_PATH = ROOT / "README.md"
 
 ICONS_DIR = HERE / "icons"
 
-# the e-ink screen: paper and ink are the same in both themes; the body and the page colours follow the theme
+# the e-ink screen is always the opposite of the page: paper on the dark page, inverted (dark mode) on the
+# light page; the body and the page colours follow the theme
 PAPER, INK = "#e8e4d9", "#1a1a18"
+SCREEN = {"dark": (PAPER, INK), "light": (INK, PAPER)}  # theme -> (screen background, screen ink)
 THEMES = {
     "dark": {"body": "#1c1e22", "edge": "#3d444d", "page_ink": "#e8e4d9", "page_muted": "#a8a497", "page_bg": "#0d1117", "dots": "#59636e"},
-    "light": {"body": "#26282c", "edge": "#101113", "page_ink": "#1a1a18", "page_muted": "#5c5a52", "page_bg": "#ffffff", "dots": "#101113"},
+    "light": {"body": "#3a3d43", "edge": "#1f2125", "page_ink": "#1a1a18", "page_muted": "#5c5a52", "page_bg": "#ffffff", "dots": "#101113"},
 }
 LIT6, LIT4I, DEP = "literata-600", "literata-400i", "departure"
 CRISP = 'shape-rendering="crispEdges"'
@@ -467,6 +469,7 @@ def month_marks(weeks):
 def hero(ctx, device, theme):
     """Wide e-ink display: thin bezel, no device chin, panel laid out in two bands."""
     c = THEMES[theme]
+    paper, ink = SCREEN[theme]
     snap, copy, L = ctx.snap, ctx.copy, ctx.lab
     mob = device == "mobile"
     if mob:
@@ -482,12 +485,12 @@ def hero(ctx, device, theme):
           f"@keyframes sweep{{0%,95%{{transform:translateY(0)}}100%{{transform:translateY({sh + 46}px)}}}}")
     d.css(K.REDUCED_MOTION_CSS)
     d.defs(f'<clipPath id="scr"><rect x="0" y="0" width="{sw}" height="{sh}" rx="2"/></clipPath>')
-    d.defs(dither("d", INK))
+    d.defs(dither("d", ink))
     # body: a plain monitor frame, power LED on the lower bezel
     d.add(f'<rect x="0.5" y="0.5" width="{W - 1}" height="{H - 1}" rx="{12 if mob else 14}" fill="{c["body"]}" stroke="{c["edge"]}"/>')
     led_y = sy + sh + chin // 2
     d.add(f'<rect x="{W - bez - 22}" y="{led_y - 1}" width="10" height="2" rx="1" fill="{c["dots"]}"/>')
-    d.add(f'<rect x="{sx}" y="{sy}" width="{sw}" height="{sh}" rx="2" fill="{PAPER}"/>')
+    d.add(f'<rect x="{sx}" y="{sy}" width="{sw}" height="{sh}" rx="2" fill="{paper}"/>')
     g = [f'<g transform="translate({sx} {sy})" clip-path="url(#scr)">']
     t = lambda *a, **k: g.append(dep(d, *a, **k))  # noqa: E731
     f11 = K.font(DEP)
@@ -498,10 +501,10 @@ def hero(ctx, device, theme):
         x0, x1 = round(label_end) + 6, round(value_start) - 6
         if x0 > x1:
             raise BuildError(f"hero-{device}: o rótulo {lab!r} e o valor {val!r} do indicador se sobrepõem")
-        t(x_left, y, lab, 11, INK)
-        t(0, y, val, 11, INK, right=x_right)
+        t(x_left, y, lab, 11, ink)
+        t(0, y, val, 11, ink, right=x_right)
         xs = range(x0 + (-x0) % 4, x1, 4)
-        g.append(f'<path d="{"".join(f"M{x} {y - 1}h1v1h-1z" for x in xs)}" fill="{INK}" {CRISP}/>')
+        g.append(f'<path d="{"".join(f"M{x} {y - 1}h1v1h-1z" for x in xs)}" fill="{ink}" {CRISP}/>')
 
     def bars(x_left, base, bw, step, mh, mon_y, every=1):
         weeks = snap["weeks_26"]
@@ -510,18 +513,18 @@ def hero(ctx, device, theme):
         for i, (cnt, h) in enumerate(zip(counts, K.sqrt_scale(counts, mh))):
             x = round(x_left + i * step)
             if cnt == 0:
-                out.append(f'<rect x="{x}" y="{base - 1}" width="{bw}" height="1" fill="{INK}"/>')
+                out.append(f'<rect x="{x}" y="{base - 1}" width="{bw}" height="1" fill="{ink}"/>')
                 continue
             hh = max(2, int(round(h / 2)) * 2)
-            fill = INK if i == len(weeks) - 1 else "url(#d50)"
+            fill = ink if i == len(weeks) - 1 else "url(#d50)"
             out.append(f'<rect x="{x}" y="{base - hh}" width="{bw}" height="{hh}" fill="{fill}"/>')
         g.append(f'<g {CRISP}>' + "".join(out) + "</g>")
         span = round(x_left + (len(weeks) - 1) * step) + bw - x_left
-        g.append(f'<rect x="{x_left}" y="{base}" width="{span}" height="1" fill="{INK}" {CRISP}/>')
+        g.append(f'<rect x="{x_left}" y="{base}" width="{span}" height="1" fill="{ink}" {CRISP}/>')
         for k, (i, name) in enumerate(month_marks(weeks)):
             if k % every:
                 continue
-            t(round(x_left + i * step), mon_y, name, 11, INK)
+            t(round(x_left + i * step), mon_y, name, 11, ink)
 
     lp = ctx.last_push
     inds = [(L["public_repos"], str(ctx.public_repos)), (L["last_push"], K.fmt_day_month_pt(lp["date"])),
@@ -529,38 +532,38 @@ def hero(ctx, device, theme):
     big = K.font(LIT6)
     total = K.fmt_int_pt(snap["contributions_year"])
     if mob:
-        t(m, 24, L["hub"], 11, INK)
-        t(0, 24, f"{L['updated']} em {K.fmt_day_month_pt(snap['today'])}", 11, INK, right=right)
-        g.append(f'<rect x="{m}" y="34" width="{right - m}" height="1" fill="{INK}" {CRISP}/>')
+        t(m, 24, L["hub"], 11, ink)
+        t(0, 24, f"{L['updated']} em {K.fmt_day_month_pt(snap['today'])}", 11, ink, right=right)
+        g.append(f'<rect x="{m}" y="34" width="{right - m}" height="1" fill="{ink}" {CRISP}/>')
         size = 34
         while big.measure(copy["name"], size) > right - m:
             size -= 1
             if size < MIN_NAME_SIZE:
                 raise BuildError(f"hero-mobile: o nome {copy['name']!r} exigiria menos de {MIN_NAME_SIZE} px para caber")
-        g.append(d.text(m, 80, copy["name"], big, size, INK))
-        g.append(f'<line x1="{m}" y1="100.5" x2="{right}" y2="100.5" stroke="{INK}" stroke-dasharray="1 3" {CRISP}/>')
+        g.append(d.text(m, 80, copy["name"], big, size, ink))
+        g.append(f'<line x1="{m}" y1="100.5" x2="{right}" y2="100.5" stroke="{ink}" stroke-dasharray="1 3" {CRISP}/>')
         for (lab, val), y in zip(inds, (128, 150, 172)):
             leaders(lab, val, y, m, right)
-        g.append(f'<line x1="{m}" y1="192.5" x2="{right}" y2="192.5" stroke="{INK}" stroke-dasharray="1 3" {CRISP}/>')
-        t(m, 228, total, 22, INK)
-        t(m, 248, L["contrib_line"], 11, INK)
+        g.append(f'<line x1="{m}" y1="192.5" x2="{right}" y2="192.5" stroke="{ink}" stroke-dasharray="1 3" {CRISP}/>')
+        t(m, 228, total, 22, ink)
+        t(m, 248, L["contrib_line"], 11, ink)
         bars(m, 322, 7, 9.6, 56, 340, every=2)
     else:
         if m + big.measure(copy["name"], 52) + 12 > 500:
             raise BuildError(f"hero-desktop: o nome {copy['name']!r} encosta na coluna dos indicadores")
-        t(m, 28, L["hub"], 11, INK)
-        t(0, 28, f"{L['updated']} em {K.fmt_date_pt(snap['today'])}", 11, INK, right=right)
-        g.append(f'<rect x="{m}" y="40" width="{right - m}" height="1" fill="{INK}" {CRISP}/>')
-        g.append(d.text(m, 106, copy["name"], big, 52, INK))
+        t(m, 28, L["hub"], 11, ink)
+        t(0, 28, f"{L['updated']} em {K.fmt_date_pt(snap['today'])}", 11, ink, right=right)
+        g.append(f'<rect x="{m}" y="40" width="{right - m}" height="1" fill="{ink}" {CRISP}/>')
+        g.append(d.text(m, 106, copy["name"], big, 52, ink))
         for (lab, val), y in zip(inds, (72, 92, 112)):
             leaders(lab, val, y, 500, right)
-        g.append(f'<line x1="{m}" y1="136.5" x2="{right}" y2="136.5" stroke="{INK}" stroke-dasharray="1 3" {CRISP}/>')
-        t(m, 172, total, 22, INK)
+        g.append(f'<line x1="{m}" y1="136.5" x2="{right}" y2="136.5" stroke="{ink}" stroke-dasharray="1 3" {CRISP}/>')
+        t(m, 172, total, 22, ink)
         f22 = f11.measure(total, 22)
-        t(round(m + f22) + 12, 172, L["contrib_line"], 11, INK)
+        t(round(m + f22) + 12, 172, L["contrib_line"], 11, ink)
         bars(m, 256, 22, (right - m - 22) / 25, 66, 276)
-    g.append(f'<rect class="sweep" x="0" y="-46" width="{sw}" height="46" fill="{INK}" opacity="0.1"/>')
-    g.append(f'<rect x="0.5" y="0.5" width="{sw - 1}" height="{sh - 1}" rx="2" fill="none" stroke="{INK}" stroke-opacity="0.25"/>')
+    g.append(f'<rect class="sweep" x="0" y="-46" width="{sw}" height="46" fill="{ink}" opacity="0.1"/>')
+    g.append(f'<rect x="0.5" y="0.5" width="{sw - 1}" height="{sh - 1}" rx="2" fill="none" stroke="{ink}" stroke-opacity="0.25"/>')
     g.append("</g>")
     d.add("\n".join(g))
     ctx.emit(f"hero-{device}-{theme}.svg", d)
